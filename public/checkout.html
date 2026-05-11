@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <title>Secure Checkout — Apna Market</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      min-height: 100vh;
+      color: #0f172a;
+      padding-bottom: 70px;
+    }
+
+    @media (min-width: 900px) {
+      body {
+        padding-bottom: 0;
+      }
+    }
+
+    
+    .glass-nav {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    @media (min-width: 768px) {
+      .glass-nav {
+        padding: 0.8rem 2rem;
+      }
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      background: linear-gradient(125deg, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      cursor: pointer;
+    }
+
+    @media (min-width: 768px) {
+      .brand {
+        font-size: 1.5rem;
+        gap: 12px;
+      }
+    }
+
+    .brand i {
+      background: none;
+      -webkit-background-clip: unset;
+      color: #3b82f6;
+    }
+
+    .nav-links-modern {
+      display: flex;
+      gap: 1rem;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 768px) {
+      .nav-links-modern {
+        gap: 1.8rem;
+      }
+    }
+
+    .nav-links-modern li a {
+      text-decoration: none;
+      font-weight: 500;
+      color: #e2e8f0;
+      transition: 0.2s;
+      font-size: 0.8rem;
+      padding: 0.3rem 0;
+      border-bottom: 2px solid transparent;
+    }
+
+    @media (min-width: 768px) {
+      .nav-links-modern li a {
+        font-size: 0.95rem;
+        padding: 0.4rem 0;
+      }
+    }
+
+    .nav-links-modern li a:hover,
+    .nav-links-modern li a.active {
+      color: #3b82f6;
+      border-bottom-color: #3b82f6;
+    }
+
+    
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 16px 20px;
+      z-index: 100;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (min-width: 900px) {
+      .bottom-nav {
+        display: none;
+      }
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: 0.2s;
+      padding: 6px 12px;
+      border-radius: 40px;
+    }
+
+    .bottom-nav-item i {
+      font-size: 1.3rem;
+    }
+
+    .bottom-nav-item.active {
+      color: #3b82f6;
+      background: #eef2ff;
+    }
+
+    
+    .checkout-page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .checkout-page {
+        padding: 2rem 1.8rem 3rem;
+      }
+    }
+
+    
+    .checkout-hero {
+      background: linear-gradient(125deg, #0f172a 0%, #1e293b 100%);
+      border-radius: 1.5rem;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+      .checkout-hero {
+        padding: 1.8rem 2rem;
+        border-radius: 2rem;
+        margin-bottom: 2rem;
+      }
+    }
+
+    .checkout-hero::after {
+      content: "🔒";
+      font-size: 80px;
+      opacity: 0.06;
+      position: absolute;
+      right: -10px;
+      bottom: -20px;
+      pointer-events: none;
+    }
+
+    @media (min-width: 768px) {
+      .checkout-hero::after {
+        font-size: 130px;
+        right: -10px;
+        bottom: -30px;
+      }
+    }
+
+    .hero-text h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.02em;
+    }
+
+    @media (min-width: 768px) {
+      .hero-text h1 {
+        font-size: 2rem;
+      }
+    }
+
+    .hero-text p {
+      color: #cbd5e1;
+      margin-top: 0.3rem;
+      font-size: 0.7rem;
+    }
+
+    @media (min-width: 768px) {
+      .hero-text p {
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+      }
+    }
+
+    .secure-badge {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      padding: 0.4rem 1rem;
+      border-radius: 60px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #facc15;
+      font-size: 0.7rem;
+    }
+
+    @media (min-width: 768px) {
+      .secure-badge {
+        padding: 0.6rem 1.4rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .checkout-grid {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+      }
+    }
+
+    
+    .checkout-section {
+      background: white;
+      border-radius: 1.2rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    @media (min-width: 768px) {
+      .checkout-section {
+        border-radius: 1.5rem;
+      }
+    }
+
+    .form-step {
+      padding: 1.2rem;
+      border-bottom: 1px solid #f0f2f5;
+    }
+
+    @media (min-width: 768px) {
+      .form-step {
+        padding: 1.5rem;
+      }
+    }
+
+    .form-step:last-child {
+      border-bottom: none;
+    }
+
+    .step-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #0f172a;
+    }
+
+    @media (min-width: 768px) {
+      .step-title {
+        gap: 10px;
+        font-size: 1.1rem;
+        margin-bottom: 1.2rem;
+      }
+    }
+
+    .step-number {
+      width: 24px;
+      height: 24px;
+      background: #3b82f6;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: white;
+    }
+
+    @media (min-width: 768px) {
+      .step-number {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+      }
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .form-group {
+      margin-bottom: 0.8rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 0.3rem;
+    }
+
+    @media (min-width: 768px) {
+      .form-group label {
+        font-size: 0.75rem;
+        margin-bottom: 0.4rem;
+      }
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 0.7rem 0.8rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 0.8rem;
+      font-family: inherit;
+      transition: 0.2s;
+      background: #fafcff;
+      font-size: 0.8rem;
+    }
+
+    @media (min-width: 768px) {
+      .form-group input, .form-group textarea {
+        padding: 0.8rem 1rem;
+        border-radius: 1rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    
+    .payment-options {
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.8rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 0.8rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    @media (min-width: 768px) {
+      .payment-option {
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: 1rem;
+      }
+    }
+
+    .payment-option:hover {
+      border-color: #3b82f6;
+      background: #f8fafc;
+    }
+
+    .payment-option.selected {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    .payment-option input {
+      accent-color: #3b82f6;
+      width: 16px;
+      height: 16px;
+    }
+
+    .payment-option span {
+      font-size: 0.8rem;
+    }
+
+    @media (min-width: 768px) {
+      .payment-option span {
+        font-size: 0.9rem;
+      }
+    }
+
+    
+    .summary-card {
+      background: white;
+      border-radius: 1.2rem;
+      padding: 1.2rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      position: sticky;
+      top: 90px;
+      align-self: start;
+    }
+
+    @media (min-width: 768px) {
+      .summary-card {
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+      }
+    }
+
+    .summary-card h2 {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @media (min-width: 768px) {
+      .summary-card h2 {
+        font-size: 1.2rem;
+        margin-bottom: 1.2rem;
+      }
+    }
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.8rem;
+    }
+
+    @media (min-width: 768px) {
+      .order-item {
+        padding: 0.8rem 0;
+        font-size: 0.9rem;
+      }
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.8rem;
+    }
+
+    @media (min-width: 768px) {
+      .summary-row {
+        padding: 0.8rem 0;
+        font-size: 0.9rem;
+      }
+    }
+
+    .summary-row.total {
+      border-bottom: none;
+      padding-top: 0.8rem;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #0f172a;
+    }
+
+    @media (min-width: 768px) {
+      .summary-row.total {
+        padding-top: 1rem;
+        font-size: 1.2rem;
+      }
+    }
+
+    .place-order-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(95deg, #3b82f6, #2563eb);
+      border: none;
+      border-radius: 60px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    @media (min-width: 768px) {
+      .place-order-btn {
+        padding: 1rem;
+        font-size: 1rem;
+      }
+    }
+
+    .place-order-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .place-order-btn:hover:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .empty-state i {
+      font-size: 2.5rem;
+      color: #cbd5e1;
+      margin-bottom: 0.8rem;
+    }
+
+    @media (min-width: 768px) {
+      .empty-state {
+        padding: 3rem;
+      }
+      .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+    }
+
+    
+    .toast-message {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 60px;
+      font-size: 0.75rem;
+      z-index: 1001;
+      opacity: 0;
+      transition: 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .delivery-note {
+      margin-top: 0.8rem;
+      background: #f8fafc;
+      padding: 0.6rem;
+      border-radius: 0.8rem;
+      font-size: 0.65rem;
+      text-align: center;
+      color: #5b6e8c;
+    }
+
+    @media (min-width: 768px) {
+      .delivery-note {
+        margin-top: 1rem;
+        padding: 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="glass-nav">
+  <div class="nav-container">
+    <div class="brand" onclick="window.location.href='index.html';">
+      <i class="fas fa-store"></i> Apna Market
+    </div>
+    <ul class="nav-links-modern">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="cart.html">Cart</a></li>
+      <li><a href="orders.html">Orders</a></li>
+      <li><a href="profile.html" id="navProfile" style="display:none;">Profile</a></li>
+      <li><a href="admin.html" id="navAdmin" style="display:none;">Admin</a></li>
+      <li><a href="login.html" id="navLogin">Login</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="checkout-page">
+  <div class="checkout-hero">
+    <div class="hero-text">
+      <h1><i class="fas fa-credit-card"></i> Secure Checkout</h1>
+      <p>Complete your purchase with confidence — 100% secure payment</p>
+    </div>
+    <div class="secure-badge">
+      <i class="fas fa-shield-alt"></i> SSL Encrypted
+    </div>
+  </div>
+
+  <div class="checkout-grid">
+    <div class="checkout-section" id="checkoutSection">
+      <div style="display: flex; justify-content: center; padding: 2rem;">
+        <div class="spinner"></div>
+      </div>
+    </div>
+    <aside class="summary-card" id="summaryCard">
+      <div style="text-align: center; padding: 1rem;">
+        <i class="fas fa-spinner fa-pulse"></i> Loading summary...
+      </div>
+    </aside>
+  </div>
+</div>
+
+
+<div class="bottom-nav">
+  <button class="bottom-nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+  <button class="bottom-nav-item" onclick="window.location.href='products.html'"><i class="fas fa-box"></i><span>Products</span></button>
+  <button class="bottom-nav-item active" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-cart"></i><span>Cart</span></button>
+  <button class="bottom-nav-item" onclick="window.location.href='orders.html'"><i class="fas fa-truck"></i><span>Orders</span></button>
+  <button class="bottom-nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>Profile</span></button>
+</div>
+
+<div id="toastMsg" class="toast-message"></div>
+
+<script src="cart.js"></script>
+<script>
+  
+  
+  
+  const API_URL = 'http://localhost:5000/api';
+  let token = localStorage.getItem('token');
+  let currentUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+
+  function authHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return headers;
+  }
+
+  function ensureAuth(redirect = 'login.html') {
+    if (!token || !currentUser) {
+      window.location.href = redirect;
+      return false;
+    }
+    return true;
+  }
+
+  async function fetchJSON(url, options = {}) {
+    const response = await fetch(url, options);
+    const json = await response.json().catch(() => null);
+    if (!response.ok) throw new Error((json && json.message) || response.statusText || 'Request failed');
+    return json;
+  }
+
+  function setUserUI() {
+    const profileLink = document.getElementById('navProfile');
+    const adminLink = document.getElementById('navAdmin');
+    const loginLink = document.getElementById('navLogin');
+    if (currentUser) {
+      if (profileLink) profileLink.style.display = 'inline-block';
+      if (loginLink) loginLink.style.display = 'none';
+      if (adminLink && currentUser.role === 'admin') adminLink.style.display = 'inline-block';
+      else if (adminLink) adminLink.style.display = 'none';
+    } else {
+      if (profileLink) profileLink.style.display = 'none';
+      if (adminLink) adminLink.style.display = 'none';
+      if (loginLink) loginLink.style.display = 'inline-block';
+    }
+  }
+
+  function getCart() {
+    const cart = localStorage.getItem('apnaCart');
+    if (cart) return JSON.parse(cart);
+    return { items: [] };
+  }
+
+  function clearCart() {
+    localStorage.setItem('apnaCart', JSON.stringify({ items: [] }));
+  }
+
+  function formatMoney(value) {
+    return `₹${Number(value || 0).toLocaleString('en-IN')}`;
+  }
+
+  let cartItems = [];
+  let selectedPayment = 'cod';
+
+  async function loadCheckoutPage() {
+    if (!ensureAuth()) return;
+    setUserUI();
+
+    const cart = getCart();
+    const section = document.getElementById('checkoutSection');
+    const summary = document.getElementById('summaryCard');
+
+    if (!cart.items.length) {
+      section.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-shopping-cart"></i>
+          <h3>Your cart is empty</h3>
+          <p>Add items to your cart before checking out.</p>
+          <button class="place-order-btn" style="background:#475569;" onclick="window.location.href='products.html'">Browse Products</button>
+        </div>
+      `;
+      summary.innerHTML = '';
+      return;
+    }
+
+    
+    const rows = await Promise.all(cart.items.map(async item => {
+      try {
+        const product = await fetchJSON(`${API_URL}/products/${item.productId}`);
+        return { product, quantity: item.quantity };
+      } catch (err) {
+        return { product: null, quantity: item.quantity, id: item.productId };
+      }
+    }));
+
+    cartItems = rows.filter(r => r.product && r.product.id);
+    if (!cartItems.length) {
+      section.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Items unavailable</h3>
+          <p>Some items in your cart are no longer available. Please update your cart.</p>
+          <button class="place-order-btn" style="background:#475569;" onclick="window.location.href='cart.html'">Go to Cart</button>
+        </div>
+      `;
+      summary.innerHTML = '';
+      return;
+    }
+
+    const subtotal = cartItems.reduce((sum, row) => sum + Number(row.product.price || 0) * row.quantity, 0);
+    const deliveryFee = subtotal > 500 ? 0 : 40;
+    const total = subtotal + deliveryFee;
+
+    
+    section.innerHTML = `
+      <div class="form-step">
+        <div class="step-title"><span class="step-number">1</span> Shipping Information</div>
+        <div class="form-row">
+          <div class="form-group"><label>Full Name *</label><input type="text" id="shippingName" placeholder="Enter your full name" value="${escapeHtml(currentUser?.name || '')}"></div>
+          <div class="form-group"><label>Email *</label><input type="email" id="shippingEmail" placeholder="your@email.com" value="${escapeHtml(currentUser?.email || '')}"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Phone Number *</label><input type="tel" id="shippingPhone" placeholder="10-digit mobile number"></div>
+          <div class="form-group"><label>Pin Code</label><input type="text" id="shippingPincode" placeholder="Postal code"></div>
+        </div>
+        <div class="form-group"><label>Full Address *</label><textarea id="shippingAddress" rows="3" placeholder="Street address, landmark, city"></textarea></div>
+      </div>
+
+      <div class="form-step">
+        <div class="step-title"><span class="step-number">2</span> Payment Method</div>
+        <div class="payment-options" id="paymentOptions">
+          <div class="payment-option selected" data-method="cod">
+            <input type="radio" name="paymentMethod" value="cod" checked> 
+            <span><i class="fas fa-money-bill-wave"></i> Cash on Delivery</span>
+          </div>
+          <div class="payment-option" data-method="card">
+            <input type="radio" name="paymentMethod" value="card"> 
+            <span><i class="fas fa-credit-card"></i> Credit / Debit Card</span>
+          </div>
+          <div class="payment-option" data-method="upi">
+            <input type="radio" name="paymentMethod" value="upi"> 
+            <span><i class="fas fa-mobile-alt"></i> UPI (Google Pay, PhonePe)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-step">
+        <button class="place-order-btn" id="placeOrderBtn"><i class="fas fa-lock"></i> Place Order · ${formatMoney(total)}</button>
+      </div>
+    `;
+
+    
+    document.querySelectorAll('.payment-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        const radio = opt.querySelector('input');
+        if (radio) radio.checked = true;
+        selectedPayment = opt.getAttribute('data-method');
+      });
+    });
+
+    
+    summary.innerHTML = `
+      <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+      <div style="max-height: 280px; overflow-y: auto;">
+        ${cartItems.map(row => `
+          <div class="order-item">
+            <span>${escapeHtml(row.product.name)} × ${row.quantity}</span>
+            <span>${formatMoney(Number(row.product.price || 0) * row.quantity)}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>${formatMoney(subtotal)}</span>
+      </div>
+      <div class="summary-row">
+        <span>Delivery Fee</span>
+        <span>${deliveryFee === 0 ? 'FREE' : formatMoney(deliveryFee)}</span>
+      </div>
+      <div class="summary-row total">
+        <span>Total Amount</span>
+        <span>${formatMoney(total)}</span>
+      </div>
+      <div class="delivery-note">
+        <i class="fas fa-check-circle" style="color: #22c55e;"></i> Free delivery on orders above ₹500
+      </div>
+    `;
+
+    document.getElementById('placeOrderBtn')?.addEventListener('click', placeOrder);
+  }
+
+  async function placeOrder() {
+    const btn = document.getElementById('placeOrderBtn');
+    const name = document.getElementById('shippingName')?.value.trim();
+    const email = document.getElementById('shippingEmail')?.value.trim();
+    const phone = document.getElementById('shippingPhone')?.value.trim();
+    const pincode = document.getElementById('shippingPincode')?.value.trim();
+    const address = document.getElementById('shippingAddress')?.value.trim();
+    
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'cod';
+
+    if (!name || !email || !phone || !address) {
+      showToast('Please fill in all required shipping details', true);
+      return;
+    }
+    if (!phone.match(/^\d{10}$/)) {
+      showToast('Please enter a valid 10-digit phone number', true);
+      return;
+    }
+    if (!cartItems.length) {
+      showToast('Your cart is empty', true);
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing...';
+
+    try {
+      const response = await fetchJSON(`${API_URL}/orders`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          items: cartItems.map(item => ({ 
+            productId: Number(item.product.id), 
+            quantity: item.quantity 
+          })),
+          shippingAddress: { name, email, phone, pincode, address },
+          paymentMethod
+        })
+      });
+
+      clearCart();
+      const orderId = response.order?.id || response.order?._id || response.id;
+      showToast('Order placed successfully! Redirecting...');
+      setTimeout(() => {
+        window.location.href = `order-confirmation.html?orderId=${orderId}`;
+      }, 800);
+    } catch (error) {
+      showToast(error.message, true);
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-lock"></i> Place Order';
+    }
+  }
+
+  function showToast(msg, isError = false) {
+    const toast = document.getElementById('toastMsg');
+    toast.innerText = msg;
+    toast.style.backgroundColor = isError ? '#b91c1c' : '#0f172a';
+    toast.style.opacity = '1';
+    setTimeout(() => toast.style.opacity = '0', 3000);
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', loadCheckoutPage);
+</script>
+</body>
+</html>

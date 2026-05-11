@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <title>Apna Market — Social E-commerce | Shop Live, Sell Fast</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0f172a;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --bg-light: #f8fafc;
+            --card-radius: 1.25rem;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+            color: #0f172a;
+            padding-bottom: 70px;
+        }
+
+        @media (min-width: 900px) {
+            body {
+                padding-bottom: 0;
+            }
+        }
+
+        
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 65px;
+            padding: 0 1rem;
+            gap: 0.8rem;
+        }
+
+        @media (min-width: 768px) {
+            .nav-container {
+                padding: 0 2rem;
+                height: 70px;
+            }
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(125deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            cursor: pointer;
+        }
+
+        @media (min-width: 768px) {
+            .brand {
+                font-size: 1.5rem;
+                gap: 10px;
+            }
+        }
+
+        .brand i {
+            background: none;
+            -webkit-background-clip: unset;
+            color: #3b82f6;
+        }
+
+        .nav-links-modern {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+        }
+
+        @media (min-width: 768px) {
+            .nav-links-modern {
+                gap: 1.8rem;
+            }
+        }
+
+        .nav-links-modern li a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+
+        @media (min-width: 768px) {
+            .nav-links-modern li a {
+                font-size: 0.95rem;
+            }
+        }
+
+        .nav-links-modern li a:hover,
+        .nav-links-modern li a.active {
+            color: #3b82f6;
+        }
+
+        @media (max-width: 900px) {
+            .nav-links-modern a[href="index.html"],
+            .nav-links-modern a[href="products.html"],
+            .nav-links-modern a[href="cart.html"],
+            .nav-links-modern a[href="orders.html"],
+            .nav-links-modern a[href="profile.html"] {
+                display: none;
+            }
+        }
+
+        .nav-search {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 60px;
+            padding: 0.2rem 0.2rem 0.2rem 1rem;
+        }
+
+        @media (max-width: 900px) {
+            .nav-links-modern {
+                display: none;
+            }
+        }
+
+        .nav-search input {
+            background: transparent;
+            border: none;
+            padding: 0.5rem;
+            color: white;
+            outline: none;
+            width: 160px;
+        }
+
+        .nav-search button {
+            background: #3b82f6;
+            border: none;
+            border-radius: 60px;
+            padding: 0.4rem 1rem;
+            color: white;
+            cursor: pointer;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: white;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 5px 12px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        
+        .main-layout {
+            display: flex;
+            padding-top: 65px;
+            min-height: 100vh;
+        }
+
+        @media (min-width: 768px) {
+            .main-layout {
+                padding-top: 70px;
+            }
+        }
+
+        
+        .sidebar-modern {
+            width: 260px;
+            position: fixed;
+            top: 65px;
+            left: 0;
+            height: calc(100vh - 65px);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 0;
+            overflow-y: auto;
+            z-index: 90;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .sidebar-modern {
+                top: 70px;
+                height: calc(100vh - 70px);
+            }
+        }
+
+        @media (min-width: 900px) {
+            .sidebar-modern {
+                transform: translateX(0);
+            }
+        }
+
+        .sidebar-modern.open {
+            transform: translateX(0);
+        }
+
+        .mode-toggle-card {
+            background: #f1f5f9;
+            margin: 0 1rem 1.5rem;
+            border-radius: 60px;
+            padding: 0.2rem;
+            display: flex;
+            cursor: pointer;
+        }
+
+        .mode-option {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 60px;
+            font-weight: 600;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .mode-option.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0 0.8rem;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.3rem;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.7rem 1rem;
+            border-radius: 1rem;
+            color: #1e293b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-menu li a i {
+            width: 24px;
+            color: #5b6e8c;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background: #eef2ff;
+            color: #3b82f6;
+        }
+
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 16px 20px;
+            z-index: 100;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (min-width: 900px) {
+            .bottom-nav {
+                display: none;
+            }
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 6px 12px;
+            border-radius: 40px;
+        }
+
+        .bottom-nav-item i {
+            font-size: 1.3rem;
+        }
+
+        .bottom-nav-item.active {
+            color: #3b82f6;
+            background: #eef2ff;
+        }
+
+        .main-content-area {
+            flex: 1;
+            margin-left: 0;
+            padding: 1rem;
+            max-width: 100%;
+        }
+
+        @media (min-width: 900px) {
+            .main-content-area {
+                margin-left: 260px;
+                padding: 2rem;
+            }
+        }
+
+        
+        .hero-glow {
+            background: linear-gradient(125deg, #0f172a, #1e293b);
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (min-width: 768px) {
+            .hero-glow {
+                padding: 2rem;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                border-radius: 2rem;
+            }
+        }
+
+        .hero-glow h2 {
+            font-size: 1.3rem;
+            color: white;
+            font-weight: 800;
+        }
+
+        @media (min-width: 768px) {
+            .hero-glow h2 {
+                font-size: 2rem;
+            }
+        }
+
+        .hero-glow p {
+            color: #cbd5e1;
+            font-size: 0.75rem;
+            margin-top: 0.3rem;
+        }
+
+        .live-badge {
+            background: rgba(239, 68, 68, 0.2);
+            padding: 0.4rem 1rem;
+            border-radius: 60px;
+            color: #f87171;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+        }
+
+        
+        .feed-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+            background: #ffffffcc;
+            backdrop-filter: blur(4px);
+            padding: 0.3rem;
+            border-radius: 60px;
+            width: fit-content;
+            flex-wrap: wrap;
+        }
+
+        .feed-tab {
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.75rem;
+        }
+
+        .feed-tab.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        
+        .posts-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .post-card-modern {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: 0.2s;
+        }
+
+        .post-header {
+            padding: 0.8rem 1rem;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .avatar-modern {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(145deg, #e2e8f0, #cbd5e1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #334155;
+        }
+
+        .post-content {
+            padding: 0.8rem 1rem;
+        }
+
+        .post-actions {
+            padding: 0.6rem 1rem;
+            display: flex;
+            gap: 1rem;
+            border-top: 1px solid #f1f5f9;
+            flex-wrap: wrap;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            color: #64748b;
+            transition: 0.2s;
+            font-size: 0.75rem;
+        }
+
+        .post-action:hover {
+            color: #3b82f6;
+        }
+
+        
+        .product-attachment {
+            margin-top: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            background: #fafcff;
+        }
+
+        .product-attachment-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+
+        .product-attachment-info {
+            padding: 10px 12px;
+        }
+
+        .product-attachment-name {
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .product-attachment-price {
+            color: #3b82f6;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .product-attachment-shop {
+            margin-top: 8px;
+            background: #3b82f6;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 60px;
+            color: white;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        
+        .products-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        @media (min-width: 500px) {
+            .products-grid-modern {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .products-grid-modern {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            }
+        }
+
+        .product-card-modern {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: 0.2s;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+        }
+
+        .product-card-modern:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 28px -12px rgba(59, 130, 246, 0.2);
+        }
+
+        .product-img {
+            height: 130px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (min-width: 768px) {
+            .product-img {
+                height: 180px;
+            }
+        }
+
+        .product-info {
+            padding: 0.7rem;
+        }
+
+        .price {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #3b82f6;
+        }
+
+        .btn-buy {
+            background: #3b82f6;
+            border: none;
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 60px;
+            color: white;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        
+        .share-toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            z-index: 2000;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        
+        .chat-toggle {
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            width: 48px;
+            height: 48px;
+            background: #3b82f6;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+            z-index: 200;
+        }
+
+        @media (min-width: 900px) {
+            .chat-toggle {
+                bottom: 24px;
+                right: 24px;
+            }
+        }
+
+        .chat-widget {
+            position: fixed;
+            bottom: 140px;
+            right: 16px;
+            width: 300px;
+            height: 450px;
+            background: white;
+            border-radius: 1.2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        @media (min-width: 480px) {
+            .chat-widget {
+                width: 350px;
+                height: 500px;
+                bottom: 90px;
+            }
+        }
+
+        .chat-widget.open {
+            display: flex;
+        }
+
+        .chat-header {
+            background: #0f172a;
+            color: white;
+            padding: 0.8rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.8rem;
+        }
+
+        .chat-bubble {
+            display: inline-block;
+            background: #e2e8f0;
+            padding: 0.4rem 0.8rem;
+            border-radius: 1rem;
+            margin: 0.3rem;
+            max-width: 85%;
+            word-break: break-word;
+        }
+
+        .chat-message.sent .chat-bubble {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 0.6rem;
+            border-top: 1px solid #e2e8f0;
+            gap: 0.5rem;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 60px;
+            border: 1px solid #e2e8f0;
+            outline: none;
+        }
+
+        
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            margin: 6px 0;
+            border-radius: 60px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 60px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 60px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="glass-nav">
+    <div class="nav-container">
+        <div class="brand" onclick="window.location.href='index.html';"><i class="fas fa-store"></i> Apna Market</div>
+        <ul class="nav-links-modern">
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="products.html">Products</a></li>
+            <li><a href="cart.html">Cart</a></li>
+            <li><a href="orders.html">Orders</a></li>
+            <li><a href="seller.html" id="navSeller" style="display:none;">Seller</a></li>
+            <li><a href="profile.html" id="navProfile" style="display:none;">Profile</a></li>
+            <li><a href="login.html" id="navLogin">Login</a></li>
+        </ul>
+        <div class="nav-search">
+            <input type="text" id="globalSearch" placeholder="Search...">
+            <button onclick="performGlobalSearch()"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="user-info" id="userInfo" style="display: none;">
+            <span id="userName"></span>
+            <div class="logout-btn" onclick="logout()">Exit</div>
+        </div>
+    </div>
+</nav>
+
+<div class="main-layout">
+    <aside class="sidebar-modern" id="sidebar">
+        <div class="mode-toggle-card" id="modeToggle">
+            <div class="mode-option active" data-mode="buy">🛍️ Buy Mode</div>
+            <div class="mode-option" data-mode="sell">📦 Sell Mode</div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" onclick="switchView('feed')" class="active" id="nav-feed"><i class="fas fa-newspaper"></i> Feed</a></li>
+            <li><a href="#" onclick="switchView('products')" id="nav-products"><i class="fas fa-box"></i> Products</a></li>
+            <li><a href="#" onclick="openCreatePost()"><i class="fas fa-plus-circle"></i> Create Post</a></li>
+           
+        </ul>
+        <ul class="sidebar-menu" id="sellerTools" style="margin-top: 1rem; display: none;">
+           
+          
+        </ul>
+    </aside>
+
+    
+    <div class="bottom-nav" id="bottomNav">
+        <button class="bottom-nav-item active" data-view="feed"><i class="fas fa-newspaper"></i><span>Feed</span></button>
+        <button class="bottom-nav-item" id="navBottomCreatePost" style="display:none;" onclick="openCreatePost()"><i class="fas fa-plus-circle"></i><span>Post</span></button>
+        <button class="bottom-nav-item" data-view="products" data-link="products" onclick="window.location.href='products.html'"><i class="fas fa-box"></i><span>Products</span></button>
+        <button class="bottom-nav-item" id="navBottomModeSwitch" onclick="toggleBottomMode()"><i class="fas fa-exchange-alt"></i><span>Sell</span></button>
+        <button class="bottom-nav-item" data-view="cart" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-cart"></i><span>Cart</span></button>
+        <button class="bottom-nav-item" data-view="orders" data-link="orders" onclick="window.location.href='orders.html'"><i class="fas fa-truck"></i><span>Orders</span></button>
+        
+        <button class="bottom-nav-item" data-view="profile" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>Profile</span></button>
+    </div>
+
+    <main class="main-content-area">
+        <div class="hero-glow">
+            <div><h2 id="heroTitle">Social Commerce, Reimagined 🚀</h2><p id="heroSubtitle">Discover trending items, live sellers, and exclusive deals</p></div>
+            <div class="live-badge"><i class="fas fa-circle" style="color:#ef4444;"></i> 10+ active sellers</div>
+        </div>
+        <div class="feed-tabs" id="feedTabs">
+            <button class="feed-tab active" onclick="switchFeedTab('all', event)">All</button>
+            <button class="feed-tab" onclick="switchFeedTab('following', event)">Following</button>
+            <button class="feed-tab" onclick="switchFeedTab('trending', event)">Trending</button>
+        </div>
+        <div id="dynamicContent" class="fade-in"><div style="text-align:center; padding:3rem;"><i class="fas fa-spinner fa-pulse"></i> Loading experience...</div></div>
+    </main>
+</div>
+
+
+
+<div id="createPostModal" class="modal"><div class="modal-content"><h3>✨ Create Post</h3><textarea id="postContent" class="form-control" rows="3" placeholder="Share something..."></textarea><select id="postProduct" class="form-control"><option value="">Link a product (optional)</option></select><button class="btn-primary" onclick="submitPost()">Post</button><button class="btn" onclick="closeModal('createPostModal')">Cancel</button></div></div>
+<div id="addProductModal" class="modal"><div class="modal-content"><h3>➕ Add Product</h3><input id="productName" class="form-control" placeholder="Name"><input id="productPrice" class="form-control" placeholder="Price" type="number"><textarea id="productDesc" class="form-control" placeholder="Description"></textarea><button class="btn-primary" onclick="submitProduct()">Add</button><button class="btn" onclick="closeModal('addProductModal')">Cancel</button></div></div>
+
+<script src="app.js"></script>
+<script src="cart.js"></script>
+<script>
+    let currentView = 'feed';
+    let currentFeedTab = 'all';
+    let allProductsCache = [];
+    let followingSellerIds = new Set();
+
+    async function loadFollowingSellers() {
+        if (!currentUser) return;
+        try {
+            const data = await fetchJSON(`${API_URL}/users/following/${currentUser.id}`, { headers: { Authorization: `Bearer ${token}` } });
+            const following = Array.isArray(data) ? data : (data.following || []);
+            followingSellerIds = new Set(following.map(u => u.id || u._id));
+        } catch (e) { followingSellerIds = new Set(); }
+    }
+
+    function showShareToast() {
+        const toast = document.createElement('div');
+        toast.className = 'share-toast';
+        toast.innerText = '🔗 Link copied to clipboard! Share with friends.';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.style.opacity = '1', 10);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2000);
+    }
+
+    async function sharePost(postId, postContent) {
+        const shareUrl = `${window.location.origin}/post.html?id=${postId}`;
+        try {
+            if (navigator.share) {
+                await navigator.share({ title: 'Check out this post on Apna Market', text: postContent, url: shareUrl });
+            } else {
+                await navigator.clipboard.writeText(shareUrl);
+                showShareToast();
+            }
+        } catch (err) {
+            await navigator.clipboard.writeText(shareUrl);
+            showShareToast();
+        }
+    }
+
+    async function switchView(view) {
+        currentView = view;
+        document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+        document.getElementById(`nav-${view}`)?.classList.add('active');
+        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+            if (item.dataset.view === view) item.classList.add('active');
+            else item.classList.remove('active');
+        });
+        document.getElementById('feedTabs').style.display = view === 'feed' ? 'flex' : 'none';
+        if (view === 'feed') await loadFeed();
+        else if (view === 'products') await loadProductsEnhanced();
+        else if (view === 'live') await loadLiveSessions();
+    }
+
+    async function loadFeed() {
+        try {
+            await loadFollowingSellers();
+            const data = await fetchJSON(`${API_URL}/posts?feedType=${currentFeedTab}`, { headers: { Authorization: `Bearer ${token}` } });
+            displayModernPosts(data.posts || []);
+        } catch(e) {
+            document.getElementById('dynamicContent').innerHTML = '<div class="empty-state">⚠️ Unable to load feed</div>';
+        }
+    }
+
+    function displayModernPosts(posts) {
+        if (!posts.length) {
+            document.getElementById('dynamicContent').innerHTML = '<div class="empty-state"><i class="fas fa-newspaper"></i><p>No posts yet. Follow sellers or create your first post!</p></div>';
+            return;
+        }
+        document.getElementById('dynamicContent').innerHTML = `<div class="posts-grid">${posts.map(p => {
+            const postId = p.id || p._id;
+            const sellerId = p.seller?.id || p.seller?._id;
+            const isFollowing = sellerId && followingSellerIds.has(sellerId);
+            const product = p.product;
+            const productImage = product?.images && product.images.length > 0 ? product.images[0] : null;
+            return `<div class="post-card-modern">
+                <div class="post-header">
+                    <div class="avatar-modern"><i class="fas fa-store"></i></div>
+                    <div><strong>${escapeHtml(p.seller?.name || 'Seller')}</strong><div style="font-size:0.7rem;">${escapeHtml(p.seller?.storeName || '')}</div></div>
+                </div>
+                <div class="post-content">
+                    <p>${escapeHtml(p.content)}</p>
+                    ${product ? `
+                        <div class="product-attachment">
+                            ${productImage ? `<img class="product-attachment-img" src="${escapeHtml(productImage)}" alt="${escapeHtml(product.name)}" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">` : `<div class="product-attachment-img" style="display:flex;align-items:center;justify-content:center;"><i class="fas fa-box fa-3x" style="color:#94a3b8;"></i></div>`}
+                            <div class="product-attachment-info">
+                                <div class="product-attachment-name">${escapeHtml(product.name)}</div>
+                                <div class="product-attachment-price">₹${product.price}</div>
+                                <button class="product-attachment-shop" onclick="buyNow('${product.id}')">Shop Now →</button>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="post-actions">
+                    <div class="post-action" onclick="toggleLike('${postId}')"><i class="far fa-heart"></i> ${p.likeCount || 0}</div>
+                    <div class="post-action" onclick="toggleComments('${postId}')"><i class="far fa-comment"></i> ${p.commentCount || 0}</div>
+                    <div class="post-action" onclick="sharePost('${postId}', '${escapeHtml(p.content).replace(/'/g, "\\'")}')"><i class="fas fa-share-alt"></i> Share</div>
+                    ${currentUser && sellerId && sellerId !== currentUser.id ? `<div class="post-action" onclick="toggleFollowSeller('${sellerId}')"><i class="fas fa-user-plus"></i> ${isFollowing ? 'Following' : 'Follow'}</div>` : ''}
+                </div>
+                <div id="comments-panel-${postId}" style="display:none; padding:0 1rem 1rem;">
+                    <div id="comment-list-${postId}"></div>
+                    <textarea id="comment-input-${postId}" class="form-control" rows="2" placeholder="Write a comment..."></textarea>
+                    <button class="btn-primary" style="margin-top:0.5rem;" onclick="submitComment('${postId}')">Submit</button>
+                </div>
+            </div>`;
+        }).join('')}</div>`;
+    }
+
+    async function loadProductsEnhanced() {
+        try { const data = await fetchJSON(`${API_URL}/products`); allProductsCache = data.products || []; displayModernProducts(allProductsCache); } 
+        catch(e) { document.getElementById('dynamicContent').innerHTML = '<div class="empty-state">Failed to load products</div>'; }
+    }
+
+    function displayModernProducts(products) {
+        if (!products.length) { document.getElementById('dynamicContent').innerHTML = '<div class="empty-state">✨ No products yet</div>'; return; }
+        document.getElementById('dynamicContent').innerHTML = `<div class="products-grid-modern">${products.map(p => `<div class="product-card-modern" onclick="buyNow('${p.id || p._id}')"><div class="product-img"><i class="fas fa-box-open fa-3x" style="color:#94a3b8;"></i></div><div class="product-info"><div><strong>${escapeHtml(p.name)}</strong></div><div class="price">₹${p.price}</div><div style="font-size:0.7rem;">${escapeHtml(p.seller?.storeName || '')}</div><button class="btn-buy">Buy Now →</button></div></div>`).join('')}</div>`;
+    }
+
+    async function loadLiveSessions() {
+        try { const data = await fetchJSON(`${API_URL}/live/active`); const sessions = data.sessions || []; if (!sessions.length) { document.getElementById('dynamicContent').innerHTML = '<div class="empty-state"><i class="fas fa-video-slash"></i><p>No live sessions</p></div>'; return; }
+        document.getElementById('dynamicContent').innerHTML = `<div class="posts-grid">${sessions.map(s => `<div class="post-card-modern"><div class="post-header"><div class="avatar-modern"><i class="fas fa-circle" style="color:#ef4444;"></i></div><div><strong>${s.seller?.storeName || 'Seller'}</strong><div>🔴 LIVE</div></div></div><div class="post-content"><h3>${s.title}</h3><p>${s.description}</p><button class="btn-buy" onclick="joinLiveSession('${s._id}')">Join Stream ▶️</button></div></div>`).join('')}</div>`;
+        } catch(e) { document.getElementById('dynamicContent').innerHTML = '<div class="empty-state">Unable to load live</div>'; }
+    }
+
+    async function joinLiveSession(sessionId) { if (!ensureAuth()) return; try { await fetchJSON(`${API_URL}/live/${sessionId}/join`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } }); showToast('🎉 Joined live!'); } catch(e) { showToast('Error joining', true); } }
+    async function toggleLike(postId) { if (!ensureAuth()) return; await fetchJSON(`${API_URL}/likes/toggle`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ postId }) }); loadFeed(); }
+    async function buyNow(productId) { if (!ensureAuth()) return; addToCart(parseInt(productId, 10), 1); showToast('Added to cart! Redirecting...'); setTimeout(() => window.location.href = 'checkout.html', 800); }
+    function performGlobalSearch() { const q = document.getElementById('globalSearch').value; if (currentView === 'products') { const filtered = allProductsCache.filter(p => p.name.toLowerCase().includes(q.toLowerCase())); displayModernProducts(filtered); } else showToast('Search works in Products tab', false); }
+    function switchFeedTab(tab, evt) { currentFeedTab = tab; document.querySelectorAll('.feed-tab').forEach(btn => btn.classList.remove('active')); if (evt?.target) evt.target.classList.add('active'); loadFeed(); }
+    async function toggleFollowSeller(sellerId) { if (!ensureAuth()) return; const isFollowing = followingSellerIds.has(sellerId); try { await fetchJSON(`${API_URL}/users/${isFollowing ? 'unfollow' : 'follow'}/${sellerId}`, { method: isFollowing ? 'DELETE' : 'POST', headers: { Authorization: `Bearer ${token}` } }); if (isFollowing) followingSellerIds.delete(sellerId); else followingSellerIds.add(sellerId); loadFeed(); } catch(e) { showToast('Unable to update', true); } }
+    async function toggleComments(postId) { const panel = document.getElementById(`comments-panel-${postId}`); if (!panel) return; const isVisible = panel.style.display === 'block'; panel.style.display = isVisible ? 'none' : 'block'; if (!isVisible) await loadPostComments(postId); }
+    async function loadPostComments(postId) { try { const comments = await fetchJSON(`${API_URL}/comments/post/${postId}`); const container = document.getElementById(`comment-list-${postId}`); if (!container) return; if (!comments.length) { container.innerHTML = '<div style="color:#475569;padding:.5rem;">No comments yet.</div>'; return; } container.innerHTML = comments.map(c => `<div style="margin-bottom:0.5rem;padding:.5rem;background:#fff;border-radius:12px;"><strong>${escapeHtml(c.user?.name || 'User')}</strong><p style="margin-top:4px;">${escapeHtml(c.content)}</p></div>`).join(''); } catch(e) { console.error(e); } }
+    async function submitComment(postId) { if (!ensureAuth()) return; const input = document.getElementById(`comment-input-${postId}`); if (!input) return; const content = input.value.trim(); if (!content) return; try { await fetchJSON(`${API_URL}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ postId, content }) }); input.value = ''; await loadPostComments(postId); showToast('Comment added'); } catch(e) { showToast(e.message, true); } }
+    async function openCreatePost() { if (!ensureAuth()) return; document.getElementById('createPostModal').style.display = 'flex'; await loadSellerProductsForSelect(); }
+    async function toggleBottomMode() { if (!ensureAuth()) return; if (currentUser?.role === 'seller') { showToast('Sell Mode is available only for normal buyer accounts.', true); return; } window.location.href = 'sell.html'; }
+    async function loadSellerProductsForSelect() { if (currentUser?.role !== 'seller') return; try { const data = await fetchJSON(`${API_URL}/products/seller/${currentUser.id}`, { headers: { Authorization: `Bearer ${token}` } }); const products = Array.isArray(data) ? data : (data.products || []); const select = document.getElementById('postProduct'); select.innerHTML = '<option value="">No product linked</option>' + products.map(p => `<option value="${p.id || p._id}">${escapeHtml(p.name)}</option>`).join(''); } catch(e) { console.error(e); } }
+    async function submitPost() { const content = document.getElementById('postContent').value; const productId = document.getElementById('postProduct').value; if(!content) return showToast('Write something', true); await fetchJSON(`${API_URL}/posts`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ content, productId: productId || null }) }); showToast('Post created!'); closeModal('createPostModal'); loadFeed(); }
+    async function openAddProduct() { if (!ensureAuth()) return; document.getElementById('addProductModal').style.display = 'flex'; }
+    async function submitProduct() { const name = document.getElementById('productName').value, price = parseFloat(document.getElementById('productPrice').value), desc = document.getElementById('productDesc').value; if(!name || !price) return showToast('Name & price required', true); await fetchJSON(`${API_URL}/products`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ name, price, description: desc, category: 'General', stock: 1 }) }); showToast('Product added!'); closeModal('addProductModal'); loadProductsEnhanced(); }
+    async function openStartLive() { if (!ensureAuth() || currentUser?.role !== 'seller') return showToast('Only sellers can go live', true); const title = prompt('Live session title:'); if(!title) return; await fetchJSON(`${API_URL}/live`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ title, description: title }) }); showToast('Live session started!'); switchView('live'); }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function toggleChat() { document.getElementById('chatWidget').classList.toggle('open'); }
+    function sendMessage() { const input = document.getElementById('chatInput'); if(!input.value) return; addChatMessage({ message: input.value }, true); input.value = ''; }
+    function addChatMessage(msg, isSent) { const container = document.getElementById('chatMessages'); const div = document.createElement('div'); div.className = `chat-message ${isSent ? 'sent' : ''}`; div.innerHTML = `<div class="chat-bubble">${escapeHtml(msg.message)}</div>`; container.appendChild(div); container.scrollTop = container.scrollHeight; }
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function showToast(msg, isError = false) { const toast = document.createElement('div'); toast.innerText = msg; toast.style.position = 'fixed'; toast.style.bottom = '80px'; toast.style.left = '50%'; toast.style.transform = 'translateX(-50%)'; toast.style.background = isError ? '#b91c1c' : '#0f172a'; toast.style.color = 'white'; toast.style.padding = '10px 20px'; toast.style.borderRadius = '60px'; toast.style.zIndex = '3000'; toast.style.fontSize = '0.8rem'; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2500); }
+
+    document.getElementById('modeToggle')?.addEventListener('click', (e) => {
+        const mode = e.target.closest('.mode-option')?.getAttribute('data-mode');
+        if (mode) {
+            document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
+            e.target.closest('.mode-option').classList.add('active');
+            if (mode === 'sell') {
+                if (currentUser && currentUser.role === 'seller') { showToast('Already a seller! Visit Seller Hub.', true); return; }
+                window.location.href = 'sell.html';
+            } else showToast('🛍️ Buyer Mode activated', false);
+        }
+    });
+
+    document.querySelectorAll('.bottom-nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            if (item.dataset.link === 'products') return;
+            const view = item.dataset.view;
+            if (view && (view === 'feed' || view === 'products' || view === 'live')) switchView(view);
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => { setUserUI(); switchView('feed'); });
+    window.switchView = switchView; window.buyNow = buyNow; window.toggleLike = toggleLike; window.joinLiveSession = joinLiveSession; window.openCreatePost = openCreatePost; window.openAddProduct = openAddProduct; window.openStartLive = openStartLive; window.submitPost = submitPost; window.submitProduct = submitProduct; window.closeModal = closeModal; window.switchFeedTab = switchFeedTab; window.toggleChat = toggleChat; window.sendMessage = sendMessage; window.performGlobalSearch = performGlobalSearch; window.logout = logout; window.toggleComments = toggleComments; window.submitComment = submitComment; window.sharePost = sharePost;
+</script>
+</body>
+</html>

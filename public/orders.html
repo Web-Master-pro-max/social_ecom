@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <title>Apna Market — My Orders Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+            color: #0f172a;
+            padding-bottom: 70px;
+        }
+
+        @media (min-width: 900px) {
+            body {
+                padding-bottom: 0;
+            }
+        }
+
+        
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        @media (min-width: 768px) {
+            .glass-nav {
+                padding: 0.8rem 2rem;
+            }
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(125deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            cursor: pointer;
+        }
+
+        @media (min-width: 768px) {
+            .brand {
+                font-size: 1.5rem;
+                gap: 12px;
+            }
+        }
+
+        .brand i {
+            background: none;
+            -webkit-background-clip: unset;
+            color: #3b82f6;
+        }
+
+        .nav-links-modern {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        @media (min-width: 768px) {
+            .nav-links-modern {
+                gap: 1.8rem;
+            }
+        }
+
+        .nav-links-modern li a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #e2e8f0;
+            transition: 0.2s;
+            font-size: 0.8rem;
+            padding: 0.3rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        @media (min-width: 768px) {
+            .nav-links-modern li a {
+                font-size: 0.95rem;
+                padding: 0.4rem 0;
+            }
+        }
+
+        .nav-links-modern li a:hover,
+        .nav-links-modern li a.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+
+        @media (max-width: 900px) {
+            .nav-links-modern a[href="index.html"],
+            .nav-links-modern a[href="products.html"],
+            .nav-links-modern a[href="cart.html"],
+            .nav-links-modern a[href="orders.html"],
+            .nav-links-modern a[href="profile.html"] {
+                display: none;
+            }
+        }
+
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 16px 20px;
+            z-index: 100;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (min-width: 900px) {
+            .bottom-nav {
+                display: none;
+            }
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 6px 12px;
+            border-radius: 40px;
+        }
+
+        .bottom-nav-item i {
+            font-size: 1.3rem;
+        }
+
+        .bottom-nav-item.active {
+            color: #3b82f6;
+            background: #eef2ff;
+        }
+
+        
+        .orders-main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .orders-main {
+                padding: 2rem 1.8rem 3rem;
+            }
+        }
+
+        
+        .hero-orders {
+            background: linear-gradient(125deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .hero-orders {
+                padding: 2rem;
+                border-radius: 2rem;
+                margin-bottom: 2rem;
+            }
+        }
+
+        .hero-orders::after {
+            content: "📦";
+            font-size: 80px;
+            opacity: 0.06;
+            position: absolute;
+            right: -10px;
+            bottom: -20px;
+            pointer-events: none;
+        }
+
+        @media (min-width: 768px) {
+            .hero-orders::after {
+                font-size: 160px;
+                right: -20px;
+                bottom: -40px;
+            }
+        }
+
+        .hero-text h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.02em;
+        }
+
+        @media (min-width: 768px) {
+            .hero-text h1 {
+                font-size: 2.2rem;
+            }
+        }
+
+        .hero-text p {
+            color: #cbd5e1;
+            margin-top: 0.3rem;
+            font-size: 0.7rem;
+        }
+
+        @media (min-width: 768px) {
+            .hero-text p {
+                font-size: 1rem;
+                margin-top: 0.5rem;
+            }
+        }
+
+        .order-stats {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            padding: 0.4rem 1rem;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #facc15;
+            font-size: 0.7rem;
+        }
+
+        @media (min-width: 768px) {
+            .order-stats {
+                padding: 0.8rem 1.8rem;
+                font-size: 1rem;
+            }
+        }
+
+        
+        .filter-bar {
+            background: white;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        @media (min-width: 768px) {
+            .filter-bar {
+                padding: 1rem 1.2rem;
+                border-radius: 1.2rem;
+            }
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        @media (min-width: 768px) {
+            .filter-chip {
+                padding: 0.5rem 1.2rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        .filter-chip.active,
+        .filter-chip:hover {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f1f5f9;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .date-filter input {
+            border: none;
+            background: transparent;
+            font-size: 0.7rem;
+            padding: 0.4rem 0;
+            outline: none;
+        }
+
+        
+        .status-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.3rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .status-filter {
+            background: transparent;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #475569;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+
+        @media (min-width: 768px) {
+            .status-filter {
+                padding: 0.6rem 1.4rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .status-filter i {
+            margin-right: 4px;
+        }
+
+        .status-filter.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
+        }
+
+        
+        .orders-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .orders-grid {
+                gap: 1.5rem;
+            }
+        }
+
+        .order-card-modern {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        @media (min-width: 768px) {
+            .order-card-modern {
+                border-radius: 1.2rem;
+            }
+        }
+
+        .order-card-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(59, 130, 246, 0.15);
+            border-color: #e0e7ff;
+        }
+
+        .order-header {
+            background: #fafcff;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        @media (min-width: 768px) {
+            .order-header {
+                padding: 1rem 1.5rem;
+            }
+        }
+
+        .order-id {
+            font-family: monospace;
+            font-weight: 700;
+            background: #f1f5f9;
+            padding: 0.2rem 0.7rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            color: #1e293b;
+        }
+
+        @media (min-width: 768px) {
+            .order-id {
+                padding: 0.3rem 0.9rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        @media (min-width: 768px) {
+            .status-badge {
+                padding: 0.4rem 1rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        .status-delivered { background: #dcfce7; color: #15803d; }
+        .status-shipped { background: #dbeafe; color: #1e40af; }
+        .status-processing { background: #fef3c7; color: #b45309; }
+        .status-pending { background: #ffe4e2; color: #b91c1c; }
+        .status-cancelled { background: #f1f5f9; color: #475569; }
+
+        .order-body {
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+        }
+
+        @media (min-width: 768px) {
+            .order-body {
+                padding: 1.2rem 1.5rem;
+                gap: 1.5rem;
+            }
+        }
+
+        .order-details {
+            flex: 2;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        @media (min-width: 768px) {
+            .detail-row {
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+        }
+
+        .detail-label {
+            font-weight: 600;
+            min-width: 70px;
+            color: #334155;
+            font-size: 0.7rem;
+        }
+
+        @media (min-width: 768px) {
+            .detail-label {
+                min-width: 90px;
+                font-size: 0.85rem;
+            }
+        }
+
+        .detail-value {
+            color: #0f172a;
+            font-weight: 500;
+            font-size: 0.7rem;
+        }
+
+        @media (min-width: 768px) {
+            .detail-value {
+                font-size: 0.9rem;
+            }
+        }
+
+        .amount-highlight {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #3b82f6;
+        }
+
+        @media (min-width: 768px) {
+            .amount-highlight {
+                font-size: 1.2rem;
+            }
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-outline-modern {
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            padding: 0.35rem 0.8rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #334155;
+            font-size: 0.65rem;
+        }
+
+        @media (min-width: 768px) {
+            .btn-outline-modern {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        .btn-outline-modern:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .btn-track {
+            background: #3b82f6;
+            border: none;
+            padding: 0.35rem 0.8rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.65rem;
+        }
+
+        @media (min-width: 768px) {
+            .btn-track {
+                padding: 0.5rem 1.2rem;
+                gap: 6px;
+                font-size: 0.75rem;
+            }
+        }
+
+        .btn-track:hover {
+            background: #2563eb;
+            transform: scale(0.97);
+        }
+
+        
+        .empty-orders {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .empty-orders {
+                padding: 3rem;
+                border-radius: 2rem;
+            }
+        }
+
+        .empty-icon {
+            font-size: 2.5rem;
+            color: #cbd5e1;
+            margin-bottom: 0.8rem;
+        }
+
+        @media (min-width: 768px) {
+            .empty-icon {
+                font-size: 3.5rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        
+        .toast-message {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-size: 0.75rem;
+            z-index: 1001;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .loader-wrapper {
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="glass-nav">
+    <div class="nav-container">
+        <div class="brand" onclick="window.location.href='index.html';">
+            <i class="fas fa-store"></i> Apna Market
+        </div>
+        <ul class="nav-links-modern">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Products</a></li>
+            <li><a href="cart.html">Cart</a></li>
+            <li><a href="orders.html" class="active">Orders</a></li>
+            <li><a href="seller.html" id="navSeller" style="display:none;">Seller</a></li>
+            <li><a href="profile.html" id="navProfile" style="display:none;">Profile</a></li>
+            <li><a href="admin.html" id="navAdmin" style="display:none;">Admin</a></li>
+            <li><a href="login.html" id="navLogin">Login</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="orders-main">
+    <div class="hero-orders">
+        <div class="hero-text">
+            <h1><i class="fas fa-shopping-bag"></i> My Orders</h1>
+            <p>Track, filter, reorder, and manage your purchases</p>
+        </div>
+        <div class="order-stats">
+            <i class="fas fa-chart-line"></i>
+            <span id="orderTotalCount">0 orders</span>
+        </div>
+    </div>
+
+    
+    <div class="filter-bar">
+        <div class="filter-group">
+            <div class="filter-chip" data-sort="date_desc"><i class="fas fa-calendar-week"></i> Newest First</div>
+            <div class="filter-chip" data-sort="date_asc"><i class="fas fa-calendar-week"></i> Oldest First</div>
+            <div class="filter-chip" data-sort="price_desc"><i class="fas fa-arrow-down"></i> Highest Price</div>
+            <div class="filter-chip" data-sort="price_asc"><i class="fas fa-arrow-up"></i> Lowest Price</div>
+        </div>
+        <div class="date-filter">
+            <i class="fas fa-calendar-alt"></i>
+            <input type="date" id="startDateFilter" placeholder="From">
+            <span>-</span>
+            <input type="date" id="endDateFilter" placeholder="To">
+        </div>
+    </div>
+
+    
+    <div class="status-tabs" id="statusFiltersContainer">
+        <button class="status-filter active" data-status="all"><i class="fas fa-list"></i> All</button>
+        <button class="status-filter" data-status="pending"><i class="fas fa-clock"></i> Pending</button>
+        <button class="status-filter" data-status="processing"><i class="fas fa-cog"></i> Processing</button>
+        <button class="status-filter" data-status="shipped"><i class="fas fa-truck"></i> Shipped</button>
+        <button class="status-filter" data-status="delivered"><i class="fas fa-check-circle"></i> Delivered</button>
+        <button class="status-filter" data-status="cancelled"><i class="fas fa-ban"></i> Cancelled</button>
+    </div>
+
+    <div id="ordersContainer">
+        <div class="loader-wrapper" id="loaderIndicator">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="bottom-nav">
+    <button class="bottom-nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="bottom-nav-item" onclick="window.location.href='products.html'"><i class="fas fa-box"></i><span>Products</span></button>
+    <button class="bottom-nav-item" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-cart"></i><span>Cart</span></button>
+    <button class="bottom-nav-item active" onclick="window.location.href='orders.html'"><i class="fas fa-truck"></i><span>Orders</span></button>
+    <button class="bottom-nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>Profile</span></button>
+</div>
+
+<div id="toastMsg" class="toast-message"></div>
+
+<script src="cart.js"></script>
+<script>
+    
+    
+    
+    const API_URL = 'http://localhost:5000/api';
+    let token = localStorage.getItem('token');
+    let currentUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+
+    function authHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers.Authorization = `Bearer ${token}`;
+        return headers;
+    }
+
+    function ensureAuth(redirect = 'login.html') {
+        if (!token || !currentUser) {
+            window.location.href = redirect;
+            return false;
+        }
+        return true;
+    }
+
+    function setUserUI() {
+        const profileLink = document.getElementById('navProfile');
+        const sellerLink = document.getElementById('navSeller');
+        const loginLink = document.getElementById('navLogin');
+        if (currentUser) {
+            if (profileLink) profileLink.style.display = 'inline-block';
+            if (sellerLink) sellerLink.style.display = currentUser.role === 'seller' ? 'inline-block' : 'none';
+            if (loginLink) loginLink.style.display = 'none';
+        } else {
+            if (profileLink) profileLink.style.display = 'none';
+            if (sellerLink) sellerLink.style.display = 'none';
+            if (loginLink) loginLink.style.display = 'inline-block';
+        }
+    }
+
+    async function fetchJSON(url, options = {}) {
+        const response = await fetch(url, options);
+        const json = await response.json().catch(() => null);
+        if (!response.ok) throw new Error((json && json.message) || response.statusText || 'Request failed');
+        return json;
+    }
+
+    function highlightNav(page) {
+        document.querySelectorAll('.nav-links-modern li a').forEach(el => {
+            const href = el.getAttribute('href') || '';
+            if (href.includes(page + '.html')) el.classList.add('active');
+            else el.classList.remove('active');
+        });
+    }
+
+    
+    let allOrders = [];
+    let currentStatusFilter = 'all';
+    let currentSort = 'date_desc';
+    let startDate = '';
+    let endDate = '';
+
+    async function loadOrders() {
+        const container = document.getElementById('ordersContainer');
+        try {
+            const endpoint = currentUser?.role === 'seller' ? 'seller-orders' : 'my-orders';
+            const data = await fetchJSON(`${API_URL}/orders/${endpoint}`, {
+                headers: authHeaders()
+            });
+            allOrders = data.orders || data || [];
+            applyAllFiltersAndRender();
+            updateStatsUI();
+        } catch (error) {
+            container.innerHTML = `<div class="empty-orders"><div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div><h3>Unable to load orders</h3><p>${error.message}</p><button class="btn-track" style="margin-top:1rem;" onclick="loadOrders()">Retry <i class="fas fa-sync-alt"></i></button></div>`;
+        }
+    }
+
+    function applyAllFiltersAndRender() {
+        let filtered = [...allOrders];
+        
+        
+        if (currentStatusFilter !== 'all') {
+            filtered = filtered.filter(order => (order.status || 'pending').toLowerCase() === currentStatusFilter.toLowerCase());
+        }
+        
+        
+        if (startDate) {
+            const start = new Date(startDate);
+            start.setHours(0, 0, 0, 0);
+            filtered = filtered.filter(order => {
+                const orderDate = order.createdAt ? new Date(order.createdAt) : new Date(0);
+                return orderDate >= start;
+            });
+        }
+        if (endDate) {
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
+            filtered = filtered.filter(order => {
+                const orderDate = order.createdAt ? new Date(order.createdAt) : new Date(0);
+                return orderDate <= end;
+            });
+        }
+        
+        
+        filtered.sort((a, b) => {
+            if (currentSort === 'date_desc') {
+                return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+            } else if (currentSort === 'date_asc') {
+                return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+            } else if (currentSort === 'price_desc') {
+                return (b.totalAmount || b.total || 0) - (a.totalAmount || a.total || 0);
+            } else if (currentSort === 'price_asc') {
+                return (a.totalAmount || a.total || 0) - (b.totalAmount || b.total || 0);
+            }
+            return 0;
+        });
+        
+        renderOrders(filtered);
+        updateStatsUI(filtered.length);
+    }
+
+    function updateStatsUI(filteredLength = null) {
+        const totalSpan = document.getElementById('orderTotalCount');
+        const count = filteredLength !== null ? filteredLength : allOrders.length;
+        if (totalSpan) totalSpan.innerText = `${count} order${count !== 1 ? 's' : ''}`;
+    }
+
+    function renderOrders(orders) {
+        const container = document.getElementById('ordersContainer');
+        if (!orders.length) {
+            container.innerHTML = `
+                <div class="empty-orders">
+                    <div class="empty-icon"><i class="fas fa-box-open"></i></div>
+                    <h3>No orders found</h3>
+                    <p>${currentStatusFilter !== 'all' ? `No ${currentStatusFilter} orders.` : "You haven't placed any orders yet."}</p>
+                    <button class="btn-track" style="margin-top:1rem; background:#475569;" onclick="window.location.href='products.html'"><i class="fas fa-store"></i> Start Shopping</button>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="orders-grid">
+                ${orders.map(order => renderOrderCard(order)).join('')}
+            </div>
+        `;
+
+        document.querySelectorAll('.btn-track-order').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = btn.getAttribute('data-id');
+                trackOrder(id);
+            });
+        });
+        document.querySelectorAll('.btn-reorder').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = btn.getAttribute('data-id');
+                reorderItems(id);
+            });
+        });
+        document.querySelectorAll('.btn-contact').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const sellerName = btn.getAttribute('data-seller');
+                showContactToast(sellerName);
+            });
+        });
+    }
+
+    function renderOrderCard(order) {
+        const orderId = String(order.id || order._id || 'ORD' + Math.floor(Math.random()*10000));
+        const status = (order.status || 'pending').toLowerCase();
+        let statusClass = 'status-pending';
+        if (status === 'delivered') statusClass = 'status-delivered';
+        else if (status === 'shipped') statusClass = 'status-shipped';
+        else if (status === 'processing') statusClass = 'status-processing';
+        else if (status === 'cancelled') statusClass = 'status-cancelled';
+        
+        const statusIcon = getStatusIcon(status);
+        const totalAmount = order.totalAmount || order.total || 0;
+        const buyerName = order.buyer?.name || order.buyer?.email || 'Customer';
+        const sellerInfo = order.seller?.storeName || order.seller?.name || (currentUser?.role === 'seller' ? 'You (Seller)' : 'Local Seller');
+        const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
+        
+        return `
+            <div class="order-card-modern">
+                <div class="order-header">
+                    <div>
+                        <span class="order-id"><i class="fas fa-hashtag"></i> ${orderId.slice(-8)}</span>
+                        <span style="margin-left: 8px; font-size:0.65rem; color:#64748b;"><i class="far fa-calendar-alt"></i> ${orderDate}</span>
+                    </div>
+                    <div class="status-badge ${statusClass}"><i class="${statusIcon}"></i> ${status.toUpperCase()}</div>
+                </div>
+                <div class="order-body">
+                    <div class="order-details">
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-user"></i> Buyer:</span>
+                            <span class="detail-value">${escapeHtml(buyerName)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-store"></i> Seller:</span>
+                            <span class="detail-value">${escapeHtml(sellerInfo)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-rupee-sign"></i> Total:</span>
+                            <span class="detail-value amount-highlight">₹${totalAmount.toLocaleString('en-IN')}</span>
+                        </div>
+                        ${order.items && order.items.length ? `
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas fa-box"></i> Items:</span>
+                            <span class="detail-value">${order.items.length} item(s)</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="order-actions">
+                        <button class="btn-outline-modern btn-contact" data-seller="${escapeAttr(sellerInfo)}"><i class="fas fa-headset"></i> Support</button>
+                        ${status === 'delivered' ? `<button class="btn-outline-modern btn-reorder" data-id="${orderId}"><i class="fas fa-redo-alt"></i> Reorder</button>` : ''}
+                        <button class="btn-track btn-track-order" data-id="${orderId}"><i class="fas fa-map-marker-alt"></i> Track</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function getStatusIcon(status) {
+        if (status === 'delivered') return 'fas fa-check-circle';
+        if (status === 'shipped') return 'fas fa-truck';
+        if (status === 'processing') return 'fas fa-sync-alt';
+        if (status === 'cancelled') return 'fas fa-times-circle';
+        return 'fas fa-hourglass-half';
+    }
+
+    function trackOrder(orderId) {
+        showToastMessage(`📍 Tracking order #${orderId.slice(-8)}: Your package is on the way!`, false);
+        setTimeout(() => {
+            showToastMessage(`📦 Estimated delivery within 3-5 business days.`, false);
+        }, 1500);
+    }
+
+    function reorderItems(orderId) {
+        const order = allOrders.find(o => `${o.id}` === `${orderId}` || `${o._id}` === `${orderId}`);
+        if (!order || !order.items) {
+            showToastMessage('Unable to reorder this order.', true);
+            return;
+        }
+
+        order.items.forEach(item => {
+            if (typeof addToCart === 'function') {
+                addToCart(item.productId, item.quantity || 1);
+            }
+        });
+
+        showToastMessage(`🔄 Reorder added to cart. Redirecting to checkout...`, false);
+        setTimeout(() => {
+            window.location.href = 'checkout.html';
+        }, 900);
+    }
+
+    function showContactToast(sellerName) {
+        showToastMessage(`📞 Connecting to ${sellerName}'s support. A representative will reach out soon.`, false);
+    }
+
+    function showToastMessage(msg, isError = false) {
+        const toast = document.getElementById('toastMsg');
+        toast.innerText = msg;
+        toast.style.backgroundColor = isError ? '#b91c1c' : '#0f172a';
+        toast.style.opacity = '1';
+        setTimeout(() => toast.style.opacity = '0', 2500);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+    }
+
+    function escapeAttr(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function setupFilters() {
+        const filterBtns = document.querySelectorAll('.status-filter');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentStatusFilter = btn.getAttribute('data-status');
+                applyAllFiltersAndRender();
+            });
+        });
+        
+        document.querySelectorAll('.filter-chip[data-sort]').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.filter-chip[data-sort]').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                currentSort = chip.getAttribute('data-sort');
+                applyAllFiltersAndRender();
+            });
+        });
+        
+        const startDateInput = document.getElementById('startDateFilter');
+        const endDateInput = document.getElementById('endDateFilter');
+        
+        startDateInput.addEventListener('change', () => {
+            startDate = startDateInput.value;
+            applyAllFiltersAndRender();
+        });
+        
+        endDateInput.addEventListener('change', () => {
+            endDate = endDateInput.value;
+            applyAllFiltersAndRender();
+        });
+        
+        document.querySelector('.filter-chip[data-sort="date_desc"]')?.classList.add('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (!ensureAuth()) return;
+        highlightNav('orders');
+        setUserUI();
+        await loadOrders();
+        setupFilters();
+        
+        setInterval(async () => {
+            if (document.visibilityState === 'visible') {
+                await loadOrders();
+            }
+        }, 30000);
+    });
+</script>
+</body>
+</html>

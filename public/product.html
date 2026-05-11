@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <title>Apna Market — Product Details</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      min-height: 100vh;
+      color: #0f172a;
+      padding-bottom: 70px;
+    }
+
+    @media (min-width: 900px) {
+      body {
+        padding-bottom: 0;
+      }
+    }
+
+    
+    .glass-nav {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    @media (min-width: 768px) {
+      .glass-nav {
+        padding: 0.8rem 2rem;
+      }
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      background: linear-gradient(125deg, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      cursor: pointer;
+    }
+
+    @media (min-width: 768px) {
+      .brand {
+        font-size: 1.5rem;
+        gap: 12px;
+      }
+    }
+
+    .brand i {
+      background: none;
+      -webkit-background-clip: unset;
+      color: #3b82f6;
+    }
+
+    .nav-links-modern {
+      display: flex;
+      gap: 1rem;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 768px) {
+      .nav-links-modern {
+        gap: 1.8rem;
+      }
+    }
+
+    .nav-links-modern li a {
+      text-decoration: none;
+      font-weight: 500;
+      color: #e2e8f0;
+      transition: 0.2s;
+      font-size: 0.8rem;
+      padding: 0.3rem 0;
+      border-bottom: 2px solid transparent;
+    }
+
+    @media (min-width: 768px) {
+      .nav-links-modern li a {
+        font-size: 0.95rem;
+        padding: 0.4rem 0;
+      }
+    }
+
+    .nav-links-modern li a:hover,
+    .nav-links-modern li a.active {
+      color: #3b82f6;
+      border-bottom-color: #3b82f6;
+    }
+
+    @media (max-width: 900px) {
+      .nav-links-modern a[href="index.html"],
+      .nav-links-modern a[href="products.html"],
+      .nav-links-modern a[href="cart.html"],
+      .nav-links-modern a[href="orders.html"],
+      .nav-links-modern a[href="profile.html"] {
+        display: none;
+      }
+    }
+
+    
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 16px 20px;
+      z-index: 100;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (min-width: 900px) {
+      .bottom-nav {
+        display: none;
+      }
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: 0.2s;
+      padding: 6px 12px;
+      border-radius: 40px;
+    }
+
+    .bottom-nav-item i {
+      font-size: 1.3rem;
+    }
+
+    .bottom-nav-item.active {
+      color: #3b82f6;
+      background: #eef2ff;
+    }
+
+    
+    .page-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .page-container {
+        padding: 2rem 1.8rem 3rem;
+      }
+    }
+
+    
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .product-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    
+    .image-gallery {
+      background: white;
+      border-radius: 1.2rem;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    @media (min-width: 768px) {
+      .image-gallery {
+        border-radius: 1.5rem;
+      }
+    }
+
+    .main-image-container {
+      position: relative;
+      background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+      padding: 1rem;
+    }
+
+    .thumbnails {
+      display: flex;
+      gap: 0.6rem;
+      padding: 0.8rem;
+      background: white;
+      border-top: 1px solid #f0f2f5;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .thumbnail {
+      width: 60px;
+      height: 60px;
+      border-radius: 0.6rem;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: 0.2s;
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 768px) {
+      .thumbnail {
+        width: 70px;
+        height: 70px;
+        border-radius: 0.8rem;
+      }
+    }
+
+    .thumbnail.active {
+      border-color: #3b82f6;
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+    }
+
+    .thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    
+    .product-info {
+      background: white;
+      border-radius: 1.2rem;
+      padding: 1.2rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    @media (min-width: 768px) {
+      .product-info {
+        border-radius: 1.5rem;
+        padding: 1.8rem;
+      }
+    }
+
+    .category-badge {
+      display: inline-block;
+      background: #eef2ff;
+      padding: 0.25rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #3b82f6;
+      margin-bottom: 0.8rem;
+    }
+
+    @media (min-width: 768px) {
+      .category-badge {
+        padding: 0.3rem 0.9rem;
+        font-size: 0.7rem;
+        margin-bottom: 1rem;
+      }
+    }
+
+    .product-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+      line-height: 1.3;
+    }
+
+    @media (min-width: 768px) {
+      .product-title {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .product-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+      color: #5b6e8c;
+      font-size: 0.7rem;
+    }
+
+    @media (min-width: 768px) {
+      .product-meta {
+        gap: 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    .price-section {
+      margin: 0.8rem 0;
+    }
+
+    @media (min-width: 768px) {
+      .price-section {
+        margin: 1.2rem 0;
+      }
+    }
+
+    .current-price {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #3b82f6;
+    }
+
+    @media (min-width: 768px) {
+      .current-price {
+        font-size: 2.2rem;
+      }
+    }
+
+    .original-price {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      text-decoration: line-through;
+      margin-left: 0.5rem;
+    }
+
+    .stock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #dcfce7;
+      padding: 0.25rem 0.7rem;
+      border-radius: 40px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #15803d;
+    }
+
+    @media (min-width: 768px) {
+      .stock-badge {
+        gap: 5px;
+        padding: 0.3rem 0.9rem;
+        font-size: 0.75rem;
+      }
+    }
+
+    .stock-badge.low {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .stock-badge.out {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .description {
+      color: #334155;
+      line-height: 1.6;
+      margin: 0.8rem 0;
+      font-size: 0.85rem;
+    }
+
+    @media (min-width: 768px) {
+      .description {
+        margin: 1.2rem 0;
+        font-size: 0.95rem;
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 768px) {
+      .action-buttons {
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+    }
+
+    .btn-primary {
+      flex: 1;
+      background: linear-gradient(95deg, #3b82f6, #2563eb);
+      border: none;
+      padding: 0.7rem;
+      border-radius: 60px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+
+    @media (min-width: 768px) {
+      .btn-primary {
+        padding: 0.9rem;
+        gap: 8px;
+        font-size: 0.9rem;
+      }
+    }
+
+    .btn-primary:hover {
+      transform: scale(0.98);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      border: none;
+      padding: 0.7rem 1rem;
+      border-radius: 60px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+
+    @media (min-width: 768px) {
+      .btn-secondary {
+        padding: 0.9rem 1.5rem;
+        gap: 8px;
+        font-size: 0.9rem;
+      }
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    
+    .seller-card {
+      background: #f8fafc;
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-top: 1rem;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    @media (min-width: 768px) {
+      .seller-card {
+        border-radius: 1.2rem;
+        padding: 1.2rem;
+        margin-top: 1.5rem;
+      }
+    }
+
+    .seller-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .seller-avatar {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(145deg, #3b82f6, #2563eb);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .seller-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+      }
+    }
+
+    .seller-name {
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    @media (min-width: 768px) {
+      .seller-name {
+        font-size: 1rem;
+      }
+    }
+
+    .seller-store {
+      font-size: 0.65rem;
+      color: #5b6e8c;
+    }
+
+    
+    .reviews-section {
+      background: white;
+      border-radius: 1.2rem;
+      padding: 1.2rem;
+      margin-top: 1.5rem;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    @media (min-width: 768px) {
+      .reviews-section {
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        margin-top: 2rem;
+      }
+    }
+
+    .reviews-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (min-width: 600px) {
+      .reviews-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+      }
+    }
+
+    .rating-summary {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .rating-number {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #f59e0b;
+    }
+
+    @media (min-width: 768px) {
+      .rating-number {
+        font-size: 2rem;
+      }
+    }
+
+    .stars {
+      display: flex;
+      gap: 2px;
+      color: #fbbf24;
+      font-size: 0.7rem;
+    }
+
+    @media (min-width: 768px) {
+      .stars {
+        gap: 3px;
+        font-size: 0.9rem;
+      }
+    }
+
+    .review-list {
+      display: grid;
+      gap: 0.8rem;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
+    .review-item {
+      padding: 0.8rem;
+      background: #fafcff;
+      border-radius: 0.8rem;
+      border: 1px solid #f0f2f5;
+    }
+
+    @media (min-width: 768px) {
+      .review-item {
+        padding: 1rem;
+        border-radius: 1rem;
+      }
+    }
+
+    .review-user {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .review-name {
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .review-date {
+      font-size: 0.6rem;
+      color: #94a3b8;
+    }
+
+    .review-rating {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 0.4rem;
+      font-size: 0.6rem;
+    }
+
+    .review-content {
+      color: #475569;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    
+    .review-form {
+      margin-top: 1.2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid #f0f2f5;
+    }
+
+    .review-form h4 {
+      margin-bottom: 0.8rem;
+      font-size: 0.9rem;
+    }
+
+    .review-form select, .review-form textarea {
+      width: 100%;
+      padding: 0.7rem;
+      border-radius: 0.8rem;
+      border: 1.5px solid #e2e8f0;
+      margin-bottom: 0.8rem;
+      font-family: inherit;
+      font-size: 0.8rem;
+    }
+
+    
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #94a3b8;
+    }
+
+    
+    .toast-message {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 60px;
+      font-size: 0.75rem;
+      z-index: 1001;
+      opacity: 0;
+      transition: 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .loader {
+      display: flex;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="glass-nav">
+  <div class="nav-container">
+    <div class="brand" onclick="window.location.href='index.html';">
+      <i class="fas fa-store"></i> Apna Market
+    </div>
+    <ul class="nav-links-modern">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html" class="active">Products</a></li>
+      <li><a href="cart.html">Cart <span id="cartCountBadge" style="background:#f97316; color:white; border-radius:999px; padding:0 0.4rem; font-size:0.6rem; margin-left:0.2rem;"></span></a></li>
+      <li><a href="orders.html">Orders</a></li>
+      <li><a href="profile.html" id="navProfile" style="display:none;">Profile</a></li>
+      <li><a href="admin.html" id="navAdmin" style="display:none;">Admin</a></li>
+      <li><a href="login.html" id="navLogin">Login</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page-container" id="productPageContainer">
+  <div class="loader">
+    <div class="spinner"></div>
+  </div>
+</div>
+
+
+<div class="bottom-nav">
+  <button class="bottom-nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+  <button class="bottom-nav-item active" onclick="window.location.href='products.html'"><i class="fas fa-box"></i><span>Products</span></button>
+  <button class="bottom-nav-item" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-cart"></i><span>Cart</span></button>
+  <button class="bottom-nav-item" onclick="window.location.href='orders.html'"><i class="fas fa-truck"></i><span>Orders</span></button>
+  <button class="bottom-nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>Profile</span></button>
+</div>
+
+<div id="toastMsg" class="toast-message"></div>
+
+<script src="cart.js"></script>
+<script>
+  
+  
+  
+  const API_URL = 'http://localhost:5000/api';
+  let token = localStorage.getItem('token');
+  let currentUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+
+  function authHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return headers;
+  }
+
+  function ensureAuth(redirect = 'login.html') {
+    if (!token || !currentUser) {
+      window.location.href = redirect;
+      return false;
+    }
+    return true;
+  }
+
+  async function fetchJSON(url, options = {}) {
+    const response = await fetch(url, options);
+    const json = await response.json().catch(() => null);
+    if (!response.ok) throw new Error((json && json.message) || response.statusText || 'Request failed');
+    return json;
+  }
+
+  function setUserUI() {
+    const profileLink = document.getElementById('navProfile');
+    const adminLink = document.getElementById('navAdmin');
+    const loginLink = document.getElementById('navLogin');
+    if (currentUser) {
+      if (profileLink) profileLink.style.display = 'inline-block';
+      if (loginLink) loginLink.style.display = 'none';
+      if (adminLink && currentUser.role === 'admin') adminLink.style.display = 'inline-block';
+      else if (adminLink) adminLink.style.display = 'none';
+    } else {
+      if (profileLink) profileLink.style.display = 'none';
+      if (adminLink) adminLink.style.display = 'none';
+      if (loginLink) loginLink.style.display = 'inline-block';
+    }
+  }
+
+  function updateCartBadge() {
+    const cart = getCart();
+    const count = cart.items.reduce((sum, i) => sum + i.quantity, 0);
+    const badge = document.getElementById('cartCountBadge');
+    if (badge) {
+      if (count > 0) badge.innerText = count;
+      else badge.innerText = '';
+    }
+  }
+
+  function getCart() {
+    const cart = localStorage.getItem('apnaCart');
+    if (cart) return JSON.parse(cart);
+    return { items: [] };
+  }
+
+  function addToCart(productId, quantity) {
+    const cart = getCart();
+    const existing = cart.items.find(i => i.productId == productId);
+    if (existing) {
+      existing.quantity += quantity;
+    } else {
+      cart.items.push({ productId, quantity });
+    }
+    localStorage.setItem('apnaCart', JSON.stringify(cart));
+    updateCartBadge();
+    showToast('✓ Added to cart!', false);
+  }
+
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = urlParams.get('id');
+
+  function showToast(msg, isError = false) {
+    const toast = document.getElementById('toastMsg');
+    toast.innerText = msg;
+    toast.style.backgroundColor = isError ? '#b91c1c' : '#0f172a';
+    toast.style.opacity = '1';
+    setTimeout(() => toast.style.opacity = '0', 2500);
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function renderStars(rating) {
+    const full = Math.floor(rating);
+    const hasHalf = rating % 1 >= 0.5;
+    let stars = '';
+    for (let i = 0; i < full; i++) stars += '<i class="fas fa-star"></i>';
+    if (hasHalf) stars += '<i class="fas fa-star-half-alt"></i>';
+    for (let i = stars.length / 2; i < 5; i++) stars += '<i class="far fa-star"></i>';
+    return stars;
+  }
+
+  async function loadProduct() {
+    const container = document.getElementById('productPageContainer');
+    if (!productId) {
+      container.innerHTML = `<div class="empty-state">Product ID missing</div>`;
+      return;
+    }
+
+    try {
+      const product = await fetchJSON(`${API_URL}/products/${productId}`);
+      const reviews = await fetchJSON(`${API_URL}/products/${productId}/reviews`).catch(() => ({ reviews: [] }));
+      renderPage(product, reviews.reviews || []);
+    } catch (error) {
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>${error.message}</p><a href="products.html" class="btn-secondary" style="margin-top:1rem;">Back to Products</a></div>`;
+    }
+  }
+
+  function renderPage(product, reviews) {
+    const container = document.getElementById('productPageContainer');
+    const images = product.images && product.images.length ? product.images : ['https://via.placeholder.com/600x600?text=No+Image'];
+    const avgRating = product.averageRating || 0;
+    const reviewCount = product.ratingCount || reviews.length;
+    const isInStock = product.stock > 0;
+    const stockClass = product.stock > 10 ? 'in' : (product.stock > 0 ? 'low' : 'out');
+    const stockText = product.stock > 10 ? 'In Stock' : (product.stock > 0 ? `Only ${product.stock} left` : 'Out of Stock');
+
+    container.innerHTML = `
+      <div class="product-grid">
+        <div class="image-gallery">
+          <div class="main-image-container">
+            <img class="main-image" id="mainImage" src="${images[0]}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/600x600?text=No+Image'">
+          </div>
+          <div class="thumbnails" id="thumbnails">
+            ${images.map((src, idx) => `
+              <div class="thumbnail ${idx === 0 ? 'active' : ''}" data-src="${src}">
+                <img src="${src}" alt="Thumbnail ${idx + 1}" onerror="this.src='https://via.placeholder.com/70x70?text=No+Image'">
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="product-info">
+          <span class="category-badge"><i class="fas fa-tag"></i> ${escapeHtml(product.category || 'Uncategorized')}</span>
+          <h1 class="product-title">${escapeHtml(product.name)}</h1>
+          <div class="product-meta">
+            <span><i class="fas fa-barcode"></i> SKU: #${String(product.id || product._id).slice(-6)}</span>
+            <span class="stock-badge ${stockClass}"><i class="fas ${product.stock > 0 ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${stockText}</span>
+          </div>
+
+          <div class="price-section">
+            <span class="current-price">₹${Number(product.price).toLocaleString('en-IN')}</span>
+            ${product.comparePrice ? `<span class="original-price">₹${Number(product.comparePrice).toLocaleString('en-IN')}</span>` : ''}
+          </div>
+
+          <div class="description">${escapeHtml(product.description || 'No description available for this product.')}</div>
+
+          <div class="action-buttons">
+            <button class="btn-primary" id="addToCartBtn" ${!isInStock ? 'disabled' : ''}>
+              <i class="fas fa-shopping-cart"></i> Add to Cart
+            </button>
+            <button class="btn-secondary" onclick="window.location.href='products.html'">
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+          </div>
+
+          <div class="seller-card">
+            <div class="seller-header">
+              <div class="seller-avatar">${(product.seller?.storeName?.charAt(0) || product.seller?.name?.charAt(0) || 'S').toUpperCase()}</div>
+              <div>
+                <div class="seller-name">${escapeHtml(product.seller?.storeName || product.seller?.name || 'Apna Seller')}</div>
+                <div class="seller-store"><i class="fas fa-store"></i> Verified Seller</div>
+              </div>
+            </div>
+            <div style="font-size:0.7rem; color:#5b6e8c;">⭐ Member since 2024 • 100% positive feedback</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reviews-section">
+        <div class="reviews-header">
+          <div>
+            <h3 style="font-size:1rem;"><i class="fas fa-comments"></i> Customer Reviews</h3>
+          </div>
+          <div class="rating-summary">
+            <span class="rating-number">${avgRating.toFixed(1)}</span>
+            <div class="stars">${renderStars(avgRating)}</div>
+            <span style="color:#5b6e8c; font-size:0.7rem;">(${reviewCount} reviews)</span>
+          </div>
+        </div>
+        <div id="reviewsList" class="review-list"></div>
+        <div id="reviewFormContainer" class="review-form"></div>
+      </div>
+    `;
+
+    
+    document.querySelectorAll('.thumbnail').forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        const src = thumb.getAttribute('data-src');
+        document.getElementById('mainImage').src = src;
+        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+      });
+    });
+
+    
+    document.getElementById('addToCartBtn')?.addEventListener('click', () => {
+      addToCart(product.id || product._id, 1);
+      showToast('✓ Product added to cart!');
+    });
+
+    
+    const reviewsList = document.getElementById('reviewsList');
+    if (reviews.length === 0) {
+      reviewsList.innerHTML = '<div class="empty-state" style="padding:1.5rem;">✨ No reviews yet. Be the first to review this product!</div>';
+    } else {
+      reviewsList.innerHTML = reviews.map(review => `
+        <div class="review-item">
+          <div class="review-user">
+            <span class="review-name">${escapeHtml(review.user?.name || 'Anonymous')}</span>
+            <span class="review-date">${new Date(review.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+          </div>
+          <div class="review-rating stars">${renderStars(review.rating || 0)}</div>
+          <div class="review-content">${escapeHtml(review.content || review.comment || 'No comment.')}</div>
+        </div>
+      `).join('');
+    }
+
+    
+    const reviewForm = document.getElementById('reviewFormContainer');
+    if (currentUser) {
+      reviewForm.innerHTML = `
+        <h4>Write a Review</h4>
+        <select id="reviewRating">
+          <option value="5">★★★★★ 5 stars</option>
+          <option value="4">★★★★☆ 4 stars</option>
+          <option value="3">★★★☆☆ 3 stars</option>
+          <option value="2">★★☆☆☆ 2 stars</option>
+          <option value="1">★☆☆☆☆ 1 star</option>
+        </select>
+        <textarea id="reviewContent" rows="3" placeholder="Share your experience with this product..."></textarea>
+        <button class="btn-primary" id="submitReviewBtn" style="width:auto; padding:0.6rem 1.2rem; font-size:0.8rem;">Submit Review</button>
+      `;
+      document.getElementById('submitReviewBtn')?.addEventListener('click', async () => {
+        const rating = parseInt(document.getElementById('reviewRating').value);
+        const content = document.getElementById('reviewContent').value.trim();
+        if (!content) {
+          showToast('Please write your review', true);
+          return;
+        }
+        try {
+          await fetchJSON(`${API_URL}/products/${productId}/reviews`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ rating, content })
+          });
+          showToast('Review submitted! Refreshing...');
+          loadProduct();
+        } catch (err) {
+          showToast(err.message, true);
+        }
+      });
+    } else {
+      reviewForm.innerHTML = `<div class="empty-state"><p><a href="login.html" style="color:#3b82f6;">Login</a> to share your review</p></div>`;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setUserUI();
+    updateCartBadge();
+    loadProduct();
+  });
+</script>
+</body>
+</html>

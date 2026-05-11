@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <title>Sell on Apna Market — Start Earning Today</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            min-height: 100vh;
+            color: #0f172a;
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), 0 1px 0 rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 0.7rem 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .glass-nav { padding: 0.8rem 2rem; }
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e2b3c, #2a4b6e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            cursor: pointer;
+        }
+
+        @media (min-width: 768px) {
+            .brand { font-size: 1.7rem; gap: 12px; }
+        }
+
+        .brand i {
+            background: linear-gradient(145deg, #2874f0, #0f5bd7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: #2874f0;
+            font-size: 1.5rem;
+        }
+
+        .nav-links-modern {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        @media (min-width: 768px) {
+            .nav-links-modern { gap: 2rem; }
+        }
+
+        .nav-links-modern li a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #2c3e50;
+            transition: 0.2s;
+            font-size: 0.85rem;
+            padding: 0.3rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        @media (min-width: 768px) {
+            .nav-links-modern li a { font-size: 1rem; padding: 0.4rem 0; }
+        }
+
+        .nav-links-modern li a:hover, .nav-links-modern li a.active {
+            color: #2874f0;
+            border-bottom-color: #2874f0;
+        }
+
+        .sell-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .sell-container { padding: 2rem 1.8rem 3rem; }
+        }
+
+        .hero-sell {
+            background: linear-gradient(125deg, #0f172a, #1e293b);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .hero-sell { padding: 2rem; border-radius: 2rem; }
+        }
+
+        .hero-sell::after {
+            content: "🚀";
+            font-size: 100px;
+            position: absolute;
+            right: -10px;
+            bottom: -20px;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        @media (min-width: 768px) {
+            .hero-sell::after { font-size: 140px; right: 0; bottom: -30px; }
+        }
+
+        .hero-sell h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .hero-sell h1 { font-size: 2.2rem; }
+        }
+
+        .hero-sell p {
+            color: #cbd5e1;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            max-width: 90%;
+        }
+
+        @media (min-width: 768px) {
+            .hero-sell p { font-size: 1rem; max-width: 70%; }
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+        }
+
+        @media (min-width: 600px) {
+            .stats-row { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .stat-mini {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(4px);
+            border-radius: 1rem;
+            padding: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .stat-mini-label {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .stat-mini-value {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .section-title {
+            margin: 1.5rem 0 1rem;
+        }
+
+        .section-title h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .section-title h2 { font-size: 1.5rem; }
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+        }
+
+        @media (min-width: 550px) {
+            .category-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (min-width: 900px) {
+            .category-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        @media (min-width: 1100px) {
+            .category-grid { grid-template-columns: repeat(6, 1fr); }
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px);
+            border-color: #2874f0;
+            box-shadow: 0 8px 20px rgba(40,116,240,0.1);
+        }
+
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            background: #eef2ff;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.6rem;
+            color: #2874f0;
+            font-size: 1.3rem;
+        }
+
+        .category-card h3 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .custom-category {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .custom-category input {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 2rem;
+            border: 1px solid #e2e8f0;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .listing-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+        }
+
+        @media (min-width: 768px) {
+            .listing-card { padding: 1.8rem; }
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            gap: 0.4rem;
+        }
+
+        .form-row label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .form-row input, .form-row select, .form-row textarea {
+            padding: 0.7rem 1rem;
+            border-radius: 0.8rem;
+            border: 1.5px solid #e2e8f0;
+            font-family: inherit;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+            outline: none;
+            border-color: #2874f0;
+            box-shadow: 0 0 0 3px rgba(40,116,240,0.1);
+        }
+
+        .form-row textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #f8fafc;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #fafcff;
+        }
+
+        .upload-area:hover {
+            border-color: #2874f0;
+            background: #eff6ff;
+        }
+
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .preview-item {
+            width: 70px;
+            height: 70px;
+            border-radius: 0.6rem;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #e2e8f0;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-item button {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(0,0,0,0.6);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.6rem;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(95deg, #2874f0, #1a5fd0);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 0.8rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary:hover, .btn-secondary:hover {
+            transform: scale(0.97);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .my-listings-section {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.4rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        }
+
+        .my-listings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .listing-card-row {
+            display: grid;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .listing-card-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        .listing-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .listing-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 1rem;
+            background: #e2e8f0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .listing-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .listing-details {
+            display: grid;
+            gap: 0.25rem;
+        }
+
+        .listing-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .listing-actions button {
+            min-width: 100px;
+        }
+
+        .my-listings-empty {
+            color: #475569;
+            padding: 1rem;
+            border-radius: 1rem;
+            background: #f1f5f9;
+            border: 1px dashed #cbd5e1;
+            text-align: center;
+        }
+
+        .preview-section {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .preview-product {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .preview-image {
+            width: 100px;
+            height: 100px;
+            background: #e2e8f0;
+            border-radius: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+        }
+
+        .preview-details {
+            flex: 1;
+        }
+
+        .dashboard-section {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 600px) {
+            .dashboard-stats { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .dashboard-stat {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            text-align: center;
+        }
+
+        .dashboard-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #2874f0;
+        }
+
+        .dashboard-stat-label {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        .toast-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            z-index: 1001;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+            max-width: 90%;
+            white-space: normal;
+            text-align: center;
+        }
+
+        .hidden { display: none; }
+
+        @media (max-width: 480px) {
+            .action-buttons { flex-direction: column; }
+            .action-buttons button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="glass-nav">
+    <div class="nav-container">
+        <div class="brand" onclick="window.location.href='index.html';">
+            <i class="fas fa-store"></i> Apna Market
+        </div>
+        <ul class="nav-links-modern">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Products</a></li>
+            <li><a href="cart.html">Cart</a></li>
+            <li><a href="orders.html">Orders</a></li>
+            <li><a href="profile.html" id="navProfile" style="display:none;">Profile</a></li>
+            <li><a href="login.html" id="navLogin">Login</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="sell-container">
+    <div class="hero-sell">
+        <h1><i class="fas fa-rocket"></i> Start Selling Today</h1>
+        <p>Join thousands of sellers — list your products, reach millions of buyers, and grow your business with Apna Market's seller tools.</p>
+        <div class="stats-row">
+            <div class="stat-mini"><div class="stat-mini-label">Products Listed</div><div class="stat-mini-value" id="heroProducts">0</div></div>
+            <div class="stat-mini"><div class="stat-mini-label">Orders Received</div><div class="stat-mini-value" id="heroOrders">0</div></div>
+            <div class="stat-mini"><div class="stat-mini-label">Active Listings</div><div class="stat-mini-value" id="heroActive">0</div></div>
+            <div class="stat-mini"><div class="stat-mini-label">Revenue</div><div class="stat-mini-value" id="heroRevenue">₹0</div></div>
+        </div>
+    </div>
+
+    <div class="section-title">
+        <h2><i class="fas fa-th-large"></i> Choose a Category</h2>
+    </div>
+    <div class="category-grid" id="categoryGrid"></div>
+
+    <div class="listing-card" id="listingForm">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem;"><i class="fas fa-plus-circle"></i> Create New Listing</h2>
+        
+        <div class="form-grid">
+            <div class="form-row">
+                <label>Product Title *</label>
+                <input type="text" id="productTitle" placeholder="e.g., Premium Wireless Headphones">
+            </div>
+            <div class="form-row">
+                <label>Category *</label>
+                <select id="productCategorySelect"></select>
+            </div>
+            <div class="form-row">
+                <label>Description *</label>
+                <textarea id="productDesc" placeholder="Describe your product features, benefits, and condition..."></textarea>
+            </div>
+            <div class="form-row">
+                <label>Price (₹) *</label>
+                <input type="number" id="productPrice" step="0.01" min="0" placeholder="0">
+            </div>
+            <div class="form-row">
+                <label>Stock Quantity *</label>
+                <input type="number" id="productStock" min="0" placeholder="0">
+            </div>
+            <div class="form-row">
+                <label>Condition</label>
+                <div class="radio-group">
+                    <label class="radio-option"><input type="radio" name="condition" value="New" checked> New</label>
+                    <label class="radio-option"><input type="radio" name="condition" value="Like New"> Like New</label>
+                    <label class="radio-option"><input type="radio" name="condition" value="Used"> Used</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>Product Images (Max 5)</label>
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i> Click or drag to upload
+                    <input type="file" id="imageUpload" accept="image/*" multiple style="display:none;">
+                </div>
+                <div class="image-preview" id="imagePreview"></div>
+            </div>
+            <div class="form-row">
+                <label>Seller Contact (Optional)</label>
+                <input type="text" id="sellerContact" placeholder="Phone number for buyer inquiries">
+            </div>
+            
+            <div class="preview-section" id="previewSection">
+                <h3 style="font-size: 0.9rem; margin-bottom: 0.8rem;">📱 Live Preview</h3>
+                <div class="preview-product">
+                    <div class="preview-image" id="previewImagePlaceholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="preview-details">
+                        <div><strong id="previewTitle">Product name</strong></div>
+                        <div style="color:#2874f0; font-weight:700;" id="previewPrice">₹0</div>
+                        <div style="font-size:0.7rem; color:#64748b;" id="previewCondition">New</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-secondary" onclick="resetForm()">Clear</button>
+            <button class="btn-primary" id="publishBtn">Publish Listing</button>
+        </div>
+    </div>
+
+    <div class="my-listings-section hidden" id="myListingsSection">
+        <div class="my-listings-header">
+            <div>
+                <h2 style="font-size: 1.2rem; margin-bottom: 0.3rem;"><i class="fas fa-list"></i> Manage Your Listings</h2>
+                <p style="color:#64748b; font-size:0.9rem; margin:0;">Edit or remove products you listed from Sell Mode.</p>
+            </div>
+            <button class="btn-secondary" onclick="cancelEdit()" id="cancelEditBtn" style="display:none;">Cancel Edit</button>
+        </div>
+        <div id="myListingsContainer" class="listing-card-row"></div>
+    </div>
+
+    <div class="dashboard-section hidden" id="dashboardSection">
+        <h2 style="font-size: 1.1rem; margin-bottom: 1rem;"><i class="fas fa-chart-line"></i> Your Seller Dashboard</h2>
+        <div class="dashboard-stats">
+            <div class="dashboard-stat"><div class="dashboard-stat-value" id="dashProducts">0</div><div class="dashboard-stat-label">Total Products</div></div>
+            <div class="dashboard-stat"><div class="dashboard-stat-value" id="dashActive">0</div><div class="dashboard-stat-label">Active Listings</div></div>
+            <div class="dashboard-stat"><div class="dashboard-stat-value" id="dashOrders">0</div><div class="dashboard-stat-label">Pending Orders</div></div>
+            <div class="dashboard-stat"><div class="dashboard-stat-value" id="dashRevenue">₹0</div><div class="dashboard-stat-label">Revenue</div></div>
+        </div>
+        <div style="background:#f8fafc; border-radius:1rem; padding:1rem; text-align:center;">
+            <i class="fas fa-chart-simple"></i> Your sales analytics will appear here as orders come in.
+        </div>
+    </div>
+</div>
+
+<div id="toastMsg" class="toast-message"></div>
+
+<script src="app.js"></script>
+<script src="cart.js"></script>
+<script>
+    const categories = [
+        "Electronics", "Fashion", "Mobile Phones", "Laptops", "Furniture",
+        "Home Appliances", "Beauty", "Books", "Sports", "Toys", 
+        "Groceries", "Handmade", "Automotive", "Pet Supplies", "Jewelry"
+    ];
+
+    let uploadedImages = [];
+    let editingProductId = null;
+    let currentUserListings = [];
+
+    function initCategories() {
+        const grid = document.getElementById('categoryGrid');
+        const select = document.getElementById('productCategorySelect');
+        
+        categories.forEach(cat => {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.onclick = () => selectCategory(cat);
+            card.innerHTML = `
+                <div class="category-icon"><i class="fas fa-tag"></i></div>
+                <h3>${cat}</h3>
+            `;
+            grid.appendChild(card);
+            
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = cat;
+            select.appendChild(option);
+        });
+        
+        const customCard = document.createElement('div');
+        customCard.className = 'category-card custom-category';
+        customCard.innerHTML = `
+            <div class="category-icon"><i class="fas fa-plus"></i></div>
+            <input type="text" id="customCatInput" placeholder="New category...">
+            <button class="btn-secondary" style="padding:0.3rem 0.8rem; font-size:0.7rem; margin-top:0.3rem;" onclick="addCustomCategory()">Add</button>
+        `;
+        grid.appendChild(customCard);
+    }
+
+    function selectCategory(cat) {
+        document.getElementById('productCategorySelect').value = cat;
+        showToast(`Category: ${cat} selected`);
+        updatePreview();
+    }
+
+    function addCustomCategory() {
+        const input = document.getElementById('customCatInput');
+        const newCat = input.value.trim();
+        if (!newCat) return showToast("Enter category name", true);
+        if (!categories.includes(newCat)) {
+            categories.push(newCat);
+            const grid = document.getElementById('categoryGrid');
+            const select = document.getElementById('productCategorySelect');
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.onclick = () => selectCategory(newCat);
+            card.innerHTML = `<div class="category-icon"><i class="fas fa-tag"></i></div><h3>${newCat}</h3>`;
+            grid.insertBefore(card, grid.lastElementChild);
+            const option = document.createElement('option');
+            option.value = newCat;
+            option.textContent = newCat;
+            select.appendChild(option);
+            input.value = '';
+            showToast(`Added category: ${newCat}`);
+        } else {
+            showToast("Category already exists", true);
+        }
+    }
+
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('imageUpload');
+    
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.style.borderColor = '#2874f0'; });
+    uploadArea.addEventListener('dragleave', () => { uploadArea.style.borderColor = '#cbd5e1'; });
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const files = Array.from(e.dataTransfer.files);
+        handleFiles(files);
+    });
+    
+    fileInput.addEventListener('change', (e) => handleFiles(Array.from(e.target.files)));
+    
+    function handleFiles(files) {
+        const imageFiles = files.filter(f => f.type.startsWith('image/'));
+        const total = uploadedImages.length + imageFiles.length;
+        if (total > 5) {
+            showToast("Maximum 5 images allowed", true);
+            return;
+        }
+        imageFiles.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImages.push({ file, src: e.target.result });
+                renderImagePreviews();
+                updatePreview();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    function renderImagePreviews() {
+        const container = document.getElementById('imagePreview');
+        container.innerHTML = '';
+        uploadedImages.forEach((img, idx) => {
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+            div.innerHTML = `
+                <img src="${img.src}" alt="preview">
+                <button onclick="removeImage(${idx})">×</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+    
+    function removeImage(idx) {
+        uploadedImages.splice(idx, 1);
+        renderImagePreviews();
+        updatePreview();
+    }
+    
+    function updatePreview() {
+        const title = document.getElementById('productTitle').value || "Product name";
+        const price = Number(document.getElementById('productPrice').value) || 0;
+        const condition = document.querySelector('input[name="condition"]:checked')?.value || "New";
+        
+        document.getElementById('previewTitle').innerText = title;
+        document.getElementById('previewPrice').innerHTML = `₹${price.toLocaleString('en-IN')}`;
+        document.getElementById('previewCondition').innerText = condition;
+        
+        const previewImgDiv = document.getElementById('previewImagePlaceholder');
+        if (uploadedImages.length > 0) {
+            previewImgDiv.innerHTML = `<img src="${uploadedImages[0].src}" style="width:100%; height:100%; object-fit:cover; border-radius:0.8rem;">`;
+        } else {
+            previewImgDiv.innerHTML = '<i class="fas fa-image"></i>';
+        }
+    }
+    
+    document.getElementById('productTitle').addEventListener('input', updatePreview);
+    document.getElementById('productPrice').addEventListener('input', updatePreview);
+    document.querySelectorAll('input[name="condition"]').forEach(radio => radio.addEventListener('change', updatePreview));
+    
+    function resetForm() {
+        document.getElementById('productTitle').value = '';
+        document.getElementById('productCategorySelect').value = categories[0];
+        document.getElementById('productDesc').value = '';
+        document.getElementById('productPrice').value = '';
+        document.getElementById('productStock').value = '';
+        document.getElementById('sellerContact').value = '';
+        uploadedImages = [];
+        editingProductId = null;
+        document.getElementById('publishBtn').innerText = 'Publish Listing';
+        document.getElementById('cancelEditBtn').style.display = 'none';
+        renderImagePreviews();
+        updatePreview();
+        showToast("Form cleared");
+    }
+    
+    async function fetchUserListings() {
+        if (!currentUser) return;
+        try {
+            const listings = await fetchJSON(`${API_URL}/products/seller/${currentUser.id}`);
+            currentUserListings = Array.isArray(listings) ? listings : [];
+            renderUserListings();
+        } catch (error) {
+            console.warn('Could not load your listings:', error.message);
+            currentUserListings = [];
+            renderUserListings();
+        }
+    }
+
+    function renderUserListings() {
+        const section = document.getElementById('myListingsSection');
+        const container = document.getElementById('myListingsContainer');
+        container.innerHTML = '';
+
+        if (!currentUserListings.length) {
+            section.classList.toggle('hidden', false);
+            container.innerHTML = `<div class="my-listings-empty">You have not listed any products yet. Create one using the form above.</div>`;
+            return;
+        }
+
+        section.classList.remove('hidden');
+        currentUserListings.forEach(product => {
+            const item = document.createElement('div');
+            item.className = 'listing-item';
+            item.innerHTML = `
+                <div class="listing-thumb">
+                    <img src="${(product.images && product.images[0]) || 'https://via.placeholder.com/80'}" alt="${product.name}">
+                </div>
+                <div class="listing-details">
+                    <strong>${product.name}</strong>
+                    <span style="font-size:0.85rem; color:#475569;">₹${Number(product.price).toLocaleString('en-IN')} • ${product.category || 'Uncategorized'}</span>
+                    <span style="font-size:0.8rem; color:#64748b;">Stock: ${product.stock || 0} • ${product.isAvailable ? 'Active' : 'Hidden'}</span>
+                </div>
+                <div class="listing-actions">
+                    <button class="btn-secondary" onclick="startEditingProductById(${product.id})">Edit</button>
+                    <button class="btn-primary" onclick="deleteListing(${product.id})">Delete</button>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function startEditingProduct(product) {
+        editingProductId = product.id;
+        document.getElementById('productTitle').value = product.name || '';
+        document.getElementById('productCategorySelect').value = product.category || categories[0];
+        document.getElementById('productDesc').value = product.description || '';
+        document.getElementById('productPrice').value = product.price || '';
+        document.getElementById('productStock').value = product.stock || '';
+        document.querySelectorAll('input[name="condition"]').forEach(radio => radio.checked = radio.value === (product.condition || 'New'));
+        document.getElementById('sellerContact').value = product.sellerContact || '';
+        uploadedImages = Array.isArray(product.images) ? product.images.map(src => ({ file: null, src })) : [];
+        renderImagePreviews();
+        updatePreview();
+        document.getElementById('publishBtn').innerText = 'Save Changes';
+        document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+        showToast('Editing listing: ' + product.name);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function startEditingProductById(id) {
+        const product = currentUserListings.find(item => item.id === id);
+        if (!product) return;
+        startEditingProduct(product);
+    }
+
+    function cancelEdit() {
+        resetForm();
+        showToast('Edit cancelled. Create a new listing or choose another item.');
+    }
+
+    async function deleteListing(productId) {
+        if (!confirm('Delete this listing permanently?')) return;
+        if (!ensureAuth()) return;
+
+        try {
+            await fetchJSON(`${API_URL}/products/${productId}`, {
+                method: 'DELETE',
+                headers: authHeaders()
+            });
+            showToast('Listing deleted successfully');
+            await fetchUserListings();
+            await loadSellerMetrics();
+            if (editingProductId === productId) resetForm();
+        } catch (error) {
+            showToast(error.message, true);
+        }
+    }
+
+    async function publishListing() {
+        const title = document.getElementById('productTitle').value.trim();
+        const category = document.getElementById('productCategorySelect').value;
+        const description = document.getElementById('productDesc').value.trim();
+        const price = parseFloat(document.getElementById('productPrice').value);
+        const stock = parseInt(document.getElementById('productStock').value);
+        const condition = document.querySelector('input[name="condition"]:checked')?.value;
+        
+        if (!title || !category || !description || isNaN(price) || price <= 0 || isNaN(stock) || stock < 0) {
+            showToast("Please fill all required fields (Title, Category, Description, Price, Stock)", true);
+            return;
+        }
+        
+        if (!ensureAuth()) return;
+        if (currentUser && currentUser.role === 'seller') {
+            showToast('Seller accounts cannot publish from Sell Mode. Use your seller dashboard instead.', true);
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('name', title);
+        formData.append('category', category);
+        formData.append('description', description);
+        formData.append('price', price);
+        formData.append('stock', stock);
+        formData.append('condition', condition);
+        formData.append('isAvailable', 'true');
+
+        const existingImageSources = uploadedImages.filter(img => !img.file).map(img => img.src);
+        if (existingImageSources.length) {
+            formData.append('existingImages', JSON.stringify(existingImageSources));
+        }
+        uploadedImages.filter(img => img.file).forEach(img => {
+            formData.append('images', img.file);
+        });
+
+        try {
+            const method = editingProductId ? 'PUT' : 'POST';
+            const url = editingProductId ? `${API_URL}/products/${editingProductId}` : `${API_URL}/products`;
+            const response = await fetch(url, {
+                method,
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+            
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.message || 'Failed to save listing');
+            }
+            
+            const result = await response.json();
+            const successMessage = editingProductId ? 'Listing updated successfully' : 'Product listed successfully!';
+            showToast(`🎉 ${successMessage}`);
+            resetForm();
+            await fetchUserListings();
+            await loadSellerMetrics();
+            document.getElementById('dashboardSection').classList.remove('hidden');
+        } catch (error) {
+            showToast(error.message, true);
+        }
+    }
+    
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById('toastMsg');
+        toast.innerText = msg;
+        toast.style.backgroundColor = isError ? '#b91c1c' : '#0f172a';
+        toast.style.opacity = '1';
+        setTimeout(() => toast.style.opacity = '0', 2500);
+    }
+    
+    async function loadSellerMetrics() {
+        if (!currentUser) {
+            document.getElementById('heroProducts').innerText = '0';
+            document.getElementById('heroOrders').innerText = '0';
+            document.getElementById('heroActive').innerText = '0';
+            document.getElementById('heroRevenue').innerText = '₹0';
+            return;
+        }
+
+        const isSeller = currentUser.role === 'seller';
+        let sellerProducts = [];
+        let sellerOrders = [];
+
+        try {
+            if (isSeller) {
+                sellerProducts = await fetchJSON(`${API_URL}/products/seller/${currentUser.id}`);
+                const ordersResponse = await fetchJSON(`${API_URL}/orders/seller-orders`, { headers: authHeaders() });
+                sellerOrders = ordersResponse.orders || ordersResponse || [];
+            } else {
+                const response = await fetchJSON(`${API_URL}/products/seller/${currentUser.id}`);
+                sellerProducts = Array.isArray(response) ? response : [];
+                sellerOrders = [];
+            }
+        } catch (error) {
+            console.warn('Seller metrics load failed:', error.message);
+        }
+
+        const productCount = Array.isArray(sellerProducts) ? sellerProducts.length : 0;
+        const activeCount = Array.isArray(sellerProducts) ? sellerProducts.filter(p => p.isAvailable).length : 0;
+        const orderCount = Array.isArray(sellerOrders) ? sellerOrders.length : 0;
+        const revenue = Array.isArray(sellerOrders)
+            ? sellerOrders.reduce((sum, order) => sum + (Number(order.totalAmount || order.total || 0)), 0)
+            : 0;
+
+        document.getElementById('heroProducts').innerText = productCount.toLocaleString('en-IN');
+        document.getElementById('heroOrders').innerText = orderCount.toLocaleString('en-IN');
+        document.getElementById('heroActive').innerText = activeCount.toLocaleString('en-IN');
+        document.getElementById('heroRevenue').innerText = `₹${revenue.toLocaleString('en-IN')}`;
+
+        if (isSeller) {
+            document.getElementById('dashProducts').innerText = productCount;
+            document.getElementById('dashActive').innerText = activeCount;
+            document.getElementById('dashOrders').innerText = orderCount;
+            document.getElementById('dashRevenue').innerText = `₹${revenue.toLocaleString('en-IN')}`;
+            document.getElementById('dashboardSection').classList.remove('hidden');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setUserUI();
+        initCategories();
+        loadSellerMetrics();
+        fetchUserListings();
+        updatePreview();
+
+        if (currentUser && currentUser.role === 'seller') {
+            showToast('⚠️ Sell mode is only available for normal buyer accounts.', true);
+            setTimeout(() => { window.location.href = 'profile.html'; }, 1800);
+            return;
+        }
+
+        if (!currentUser) {
+            showToast('Login with a normal user account to access Sell Mode and publish listings.', false);
+        } else if (currentUser.role !== 'buyer') {
+            showToast('Please login with a normal account to access Sell Mode.', false);
+        }
+    });
+    
+    document.getElementById('publishBtn').addEventListener('click', publishListing);
+</script>
+</body>
+</html>

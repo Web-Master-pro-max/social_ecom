@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Apna Market — Live Shopping & Streams</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%);
+            min-height: 100vh;
+            color: #0f172a;
+        }
+
+        
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), 0 1px 0 rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 0.8rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.7rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e2b3c, #2a4b6e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            cursor: pointer;
+            letter-spacing: -0.3px;
+        }
+
+        .brand i {
+            background: linear-gradient(145deg, #2874f0, #0f5bd7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: #2874f0;
+            font-size: 1.9rem;
+        }
+
+        .nav-links-modern {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links-modern li a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #2c3e50;
+            transition: 0.2s;
+            font-size: 1rem;
+            padding: 0.4rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-links-modern li a:hover, .nav-links-modern li a.active {
+            color: #2874f0;
+            border-bottom-color: #2874f0;
+        }
+
+        
+        .main-live-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.8rem 3rem;
+        }
+
+        .hero-live {
+            background: linear-gradient(125deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 2rem;
+            padding: 2rem 2rem;
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-live::before {
+            content: "🔴";
+            font-size: 180px;
+            opacity: 0.08;
+            position: absolute;
+            right: -20px;
+            bottom: -40px;
+            pointer-events: none;
+        }
+
+        .hero-text h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-text p {
+            color: #cbd5e1;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .live-badge {
+            background: rgba(239, 68, 68, 0.2);
+            backdrop-filter: blur(4px);
+            padding: 0.6rem 1.4rem;
+            border-radius: 60px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .live-badge i {
+            font-size: 0.9rem;
+            animation: pulseRed 1.2s infinite;
+        }
+
+        @keyframes pulseRed {
+            0% { opacity: 0.4; transform: scale(0.9);}
+            100% { opacity: 1; transform: scale(1.1);}
+        }
+
+        
+        .stats-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1rem 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02);
+            border: 1px solid #eef2ff;
+            backdrop-filter: blur(2px);
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .stat-icon {
+            background: #eef2ff;
+            width: 48px;
+            height: 48px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2874f0;
+            font-size: 1.4rem;
+        }
+
+        .stat-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        
+        .section-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin: 2rem 0 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .section-title h2 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            background: linear-gradient(125deg, #1e2a3a, #2c3e66);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .live-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 2rem;
+        }
+
+        .live-room-panel {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 0 14px 30px rgba(0,0,0,0.08);
+            border: 1px solid rgba(226,232,240,0.8);
+        }
+
+        .live-room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .live-room-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .live-room-meta {
+            color: #475569;
+            font-size: 0.9rem;
+            margin-top: 0.35rem;
+        }
+
+        .live-room-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .live-video-placeholder {
+            background: linear-gradient(135deg, #0c4a6e, #1e293b);
+            border-radius: 1.3rem;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .live-video-label {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .live-video-status {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background: rgba(255,255,255,0.13);
+            padding: 0.45rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+        }
+
+        .chat-panel {
+            background: #f8fafc;
+            border-radius: 1.3rem;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 700;
+            margin-bottom: 0.9rem;
+            color: #0f172a;
+        }
+
+        .chat-list {
+            max-height: 260px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .chat-message {
+            padding: 0.9rem 1rem;
+            border-radius: 1rem;
+            background: white;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+        }
+
+        .chat-message strong {
+            display: block;
+            margin-bottom: 0.35rem;
+            color: #111827;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            min-width: 0;
+            padding: 0.95rem 1rem;
+            border-radius: 999px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .btn-end-live {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.85rem 1.3rem;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .btn-end-live:hover {
+            background: #dc2626;
+        }
+
+        .live-room-body {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .live-room-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .live-stream-card {
+            background: white;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+        }
+
+        .live-stream-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 25px 35px -14px rgba(40, 116, 240, 0.2);
+        }
+
+        .card-media {
+            position: relative;
+            background: linear-gradient(145deg, #0b1120, #1a2538);
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .live-flag {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: #ef4444;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(2px);
+            z-index: 2;
+        }
+
+        .viewer-count {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-content {
+            padding: 1.3rem 1.4rem 1.6rem;
+        }
+
+        .host-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .host-avatar {
+            background: #eef2ff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #2874f0;
+        }
+
+        .host-details strong {
+            display: block;
+            font-size: 1rem;
+        }
+
+        .host-details span {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+        }
+
+        .session-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 10px 0 6px;
+            line-height: 1.3;
+        }
+
+        .session-desc {
+            font-size: 0.85rem;
+            color: #4b5563;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .btn-join-live {
+            background: linear-gradient(95deg, #2874f0, #1a5fd0);
+            border: none;
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-join-live:hover {
+            background: linear-gradient(95deg, #1a5fd0, #0f4ca8);
+            transform: scale(0.98);
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 1.8rem;
+            padding: 3rem;
+            text-align: center;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+
+        
+        .floating-create {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2874f0;
+            width: 56px;
+            height: 56px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 10px 20px rgba(40, 116, 240, 0.3);
+            cursor: pointer;
+            z-index: 99;
+            transition: 0.2s;
+            border: none;
+            font-size: 1.5rem;
+        }
+
+        .floating-create:hover {
+            transform: scale(1.05);
+            background: #1a5fd0;
+        }
+
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: white;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 2rem;
+            padding: 1.8rem;
+            box-shadow: 0 40px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border-radius: 60px;
+            border: 1.5px solid #e2e8f0;
+            font-family: inherit;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            z-index: 1001;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+        }
+
+        @media (max-width: 700px) {
+            .main-live-container {
+                padding: 1rem;
+            }
+            .hero-text h1 {
+                font-size: 1.6rem;
+            }
+            .live-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="glass-nav">
+    <div class="nav-container">
+        <div class="brand" onclick="window.location.href='index.html';">
+            <i class="fas fa-store"></i> Apna Market
+        </div>
+        <ul class="nav-links-modern">
+            <li><a href="index.html" data-page="home">Home</a></li>
+            <li><a href="products.html" data-page="products">Products</a></li>
+            <li><a href="orders.html" data-page="orders">Orders</a></li>
+            <li><a href="seller.html" id="navSeller" style="display:none;">Seller</a></li>
+            <li><a href="profile.html" id="navProfile" style="display:none;">Profile</a></li>
+            <li><a href="admin.html" id="navAdmin" style="display:none;">Admin</a></li>
+            <li><a href="login.html" id="navLogin">Login</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="main-live-container">
+    <div class="hero-live">
+        <div class="hero-text">
+            <h1>🎥 Live Feature Temporarily Hidden</h1>
+            <p>We have disabled live shopping for now. Please visit Products or Orders for the latest marketplace activity.</p>
+        </div>
+        <div class="live-badge">
+            <i class="fas fa-circle"></i> Disabled
+        </div>
+    </div>
+
+    
+    <div class="stats-row" id="statsRow">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-video"></i></div>
+            <div class="stat-info">
+                <h3 id="activeSessionsCount">0</h3>
+                <span>Active streams</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+                <h3 id="totalViewers">0</h3>
+                <span>Live viewers</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="stat-info">
+                <h3>🔥 Trending</h3>
+                <span>Social commerce</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">
+        <h2><i class="fas fa-play-circle" style="color:#2874f0;"></i> Live sessions now</h2>
+        <span style="font-size:0.8rem; color:#475569;">Join & engage in real-time</span>
+    </div>
+
+    <div id="liveSessionsGrid" class="live-grid">
+        
+        <div class="empty-state" id="loading-placeholder">
+            <i class="fas fa-spinner fa-pulse"></i>
+            <p>Loading live broadcasts...</p>
+        </div>
+    </div>
+</div>
+
+<div id="liveRoomContainer" class="live-room-panel" style="display:none;">
+    <div class="live-room-header">
+        <div>
+            <div class="live-room-title" id="liveRoomTitle">Live Stream</div>
+            <div class="live-room-meta" id="liveRoomMeta">Connected to live chat</div>
+        </div>
+        <div class="live-room-buttons">
+            <button class="btn-join-live" id="leaveLiveBtn">Leave</button>
+            <button class="btn-end-live" id="endLiveBtn" style="display:none;">End Live</button>
+        </div>
+    </div>
+    <div class="live-room-body">
+        <div class="live-video-placeholder">
+            <div class="live-video-label">Live video placeholder</div>
+            <div class="live-video-status" id="liveViewerCount">0 viewers</div>
+        </div>
+        <div class="chat-panel">
+            <div class="chat-header"><i class="fas fa-comments"></i> Live chat</div>
+            <div class="chat-list" id="liveChatList"></div>
+            <div class="chat-input-row">
+                <input id="liveChatInput" class="chat-input" type="text" placeholder="Send a message to the seller...">
+                <button class="btn-join-live" id="sendLiveChatBtn">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<button class="floating-create" id="createLiveBtn" style="display: none;">
+    <i class="fas fa-broadcast-tower"></i>
+</button>
+
+
+<div id="createModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3>🚀 Go Live</h3>
+        <div class="input-group">
+            <input type="text" id="liveTitle" placeholder="Session title (e.g. Weekend sale)">
+        </div>
+        <div class="input-group">
+            <textarea id="liveDesc" rows="2" placeholder="Describe your live stream..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-join-live" style="background:#1f2937;" id="cancelModalBtn">Cancel</button>
+            <button class="btn-join-live" id="confirmCreateLive">Start Live</button>
+        </div>
+    </div>
+</div>
+
+<div id="toastMessage" class="toast-msg"></div>
+
+<script>
+    
+    
+    
+    const API_URL = 'http://localhost:5000/api';
+    let token = localStorage.getItem('token');
+    let currentUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+
+    function authHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
+        return headers;
+    }
+
+    function saveAuth(data) {  }
+    function ensureAuth(redirect = 'login.html') {
+        if (!token || !currentUser) {
+            window.location.href = redirect;
+            return false;
+        }
+        return true;
+    }
+
+    function setUserUI() {
+        const profileLink = document.getElementById('navProfile');
+        const sellerLink = document.getElementById('navSeller');
+        const loginLink = document.getElementById('navLogin');
+        if (currentUser) {
+            if (profileLink) profileLink.style.display = 'inline-block';
+            if (sellerLink) sellerLink.style.display = currentUser.role === 'seller' ? 'inline-block' : 'none';
+            if (loginLink) loginLink.style.display = 'none';
+            
+            if (currentUser.role === 'seller') {
+                const createBtn = document.getElementById('createLiveBtn');
+                if (createBtn) createBtn.style.display = 'flex';
+            }
+        } else {
+            if (profileLink) profileLink.style.display = 'none';
+            if (sellerLink) sellerLink.style.display = 'none';
+            if (loginLink) loginLink.style.display = 'inline-block';
+            const createBtn = document.getElementById('createLiveBtn');
+            if (createBtn) createBtn.style.display = 'none';
+        }
+    }
+
+    async function fetchJSON(url, options = {}) {
+        const response = await fetch(url, options);
+        const json = await response.json().catch(() => null);
+        if (!response.ok) {
+            throw new Error((json && json.message) || response.statusText || 'Request failed');
+        }
+        return json;
+    }
+
+    function highlightNav(page) {
+        document.querySelectorAll('.nav-links-modern li a').forEach(el => {
+            const href = el.getAttribute('href') || '';
+            if (href.includes(page + '.html')) el.classList.add('active');
+            else el.classList.remove('active');
+        });
+    }
+
+    
+    let liveSessions = [];
+    let socket;
+    let currentLiveSession = null;
+
+    async function initSocket() {
+        if (!window.io || socket) return;
+        if (!token || !currentUser) return;
+
+        socket = io();
+        socket.on('connect', () => {
+            if (currentUser) {
+                socket.emit('register', currentUser.id);
+            }
+        });
+
+        socket.on('liveMessage', (message) => {
+            if (currentLiveSession && message.liveSessionId === currentLiveSession.id) {
+                appendLiveChatMessage(message);
+            }
+        });
+
+        socket.on('viewerCount', (count) => {
+            if (currentLiveSession) {
+                document.getElementById('liveViewerCount').innerText = `${count} viewers`;
+            }
+            if (liveSessions.length) loadLiveSessions();
+        });
+
+        socket.on('liveEnded', (endedSessionId) => {
+            if (currentLiveSession && currentLiveSession.id == endedSessionId) {
+                showToastMessage('Live session has ended');
+                closeLiveRoom();
+            }
+            loadLiveSessions();
+        });
+    }
+
+    async function loadLiveSessions() {
+        await initSocket();
+        const grid = document.getElementById('liveSessionsGrid');
+        try {
+            const data = await fetchJSON(`${API_URL}/live/active`);
+            const sessions = data.sessions || data || [];
+            liveSessions = Array.isArray(sessions) ? sessions : [];
+            renderLiveGrid(liveSessions);
+            updateStats(liveSessions);
+            const badge = document.querySelector('.live-badge');
+            if (badge) badge.innerHTML = `<i class="fas fa-circle"></i> ${liveSessions.length} live now`;
+        } catch (error) {
+            grid.innerHTML = `<div class="empty-state"><i class="fas fa-wifi-slash"></i><p>⚠️ ${error.message}</p><p style="font-size:0.8rem;">Could not fetch live sessions</p></div>`;
+        }
+    }
+
+    function updateStats(sessions) {
+        const activeCount = sessions.length;
+        const totalViewers = sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0);
+        const activeSpan = document.getElementById('activeSessionsCount');
+        const viewersSpan = document.getElementById('totalViewers');
+        if (activeSpan) activeSpan.innerText = activeCount;
+        if (viewersSpan) viewersSpan.innerText = totalViewers;
+    }
+
+    function renderLiveGrid(sessions) {
+        const grid = document.getElementById('liveSessionsGrid');
+        if (!sessions.length) {
+            grid.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><h3>No live streams right now</h3><p>Be the first to start a live session or check back later!</p></div>`;
+            return;
+        }
+        grid.innerHTML = sessions.map(session => {
+            const sessionId = session._id || session.id || '';
+            const sellerName = session.seller?.storeName || session.seller?.name || 'Local Seller';
+            const avatarInitial = (sellerName.charAt(0) || 'S').toUpperCase();
+            const title = session.title || 'Live Special Event';
+            const description = session.description || 'Tap to join interactive shopping!';
+            const viewers = session.viewerCount || Math.floor(Math.random() * 120) + 15;
+            const isOwner = currentUser?.role === 'seller' && currentUser?.id == session.seller?.id;
+            const endButton = isOwner ? `<button class="btn-end-live" data-end-id="${sessionId}"><i class="fas fa-power-off"></i> End Live</button>` : '';
+            return `
+                <div class="live-stream-card" data-id="${sessionId}">
+                    <div class="card-media">
+                        <div class="live-flag"><i class="fas fa-circle"></i> LIVE</div>
+                        <div class="viewer-count"><i class="fas fa-eye"></i> ${viewers} watching</div>
+                        <i class="fas fa-play-circle" style="font-size: 4rem; color: rgba(255,255,255,0.3);"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="host-info">
+                            <div class="host-avatar">${avatarInitial}</div>
+                            <div class="host-details">
+                                <strong>${sellerName}</strong>
+                                <span><i class="fas fa-store"></i> Live seller</span>
+                            </div>
+                        </div>
+                        <div class="session-title">${escapeHtml(title)}</div>
+                        <div class="session-desc">${escapeHtml(description)}</div>
+                        <div style="display:flex; gap:.75rem; flex-wrap:wrap;">
+                            <button class="btn-join-live" data-id="${sessionId}"><i class="fas fa-ticket-alt"></i> Join Live Stream</button>
+                            ${endButton}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        
+        document.querySelectorAll('.btn-join-live').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const id = btn.getAttribute('data-id');
+                await joinLiveSession(id);
+            });
+        });
+        document.querySelectorAll('.btn-end-live').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const id = btn.getAttribute('data-end-id');
+                await endLiveSession(id);
+            });
+        });
+        
+        document.querySelectorAll('.live-stream-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.target.classList.contains('btn-join-live') || e.target.classList.contains('btn-end-live')) return;
+                const id = card.getAttribute('data-id');
+                if (id) joinLiveSession(id);
+            });
+        });
+    }
+
+    async function joinLiveSession(sessionId) {
+        if (!ensureAuth()) return;
+        try {
+            const res = await fetchJSON(`${API_URL}/live/${sessionId}/join`, {
+                method: 'POST',
+                headers: authHeaders()
+            });
+            currentLiveSession = liveSessions.find(s => String(s.id) === String(sessionId)) || res;
+            showToastMessage('🎉 Joined live session! Enjoy interactive deals 🛍️');
+            if (socket && currentLiveSession) {
+                socket.emit('joinLive', sessionId, currentUser.id);
+            }
+            openLiveRoom(currentLiveSession);
+            loadLiveSessions();
+        } catch (error) {
+            showToastMessage(error.message || 'Unable to join, try again', true);
+        }
+    }
+
+    async function endLiveSession(sessionId) {
+        if (!ensureAuth() || currentUser?.role !== 'seller') return showToastMessage('Only the seller can end this live', true);
+        try {
+            await fetchJSON(`${API_URL}/live/${sessionId}/end`, {
+                method: 'POST',
+                headers: authHeaders()
+            });
+            showToastMessage('Live session ended');
+            if (currentLiveSession && String(currentLiveSession.id) === String(sessionId)) {
+                closeLiveRoom();
+            }
+            loadLiveSessions();
+        } catch (error) {
+            showToastMessage(error.message || 'Unable to end live', true);
+        }
+    }
+
+    
+    async function createLiveSession(title, description) {
+        if (!currentUser || currentUser.role !== 'seller') {
+            showToastMessage('Only sellers can start a live stream', true);
+            return;
+        }
+        try {
+            const data = await fetchJSON(`${API_URL}/live`, {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify({ title, description })
+            });
+            currentLiveSession = data;
+            showToastMessage('✅ Live session started!');
+            closeModal();
+            loadLiveSessions();
+            openLiveRoom(data);
+            if (socket) socket.emit('joinLive', data.id, currentUser.id);
+        } catch (err) {
+            showToastMessage(err.message || 'Error creating live session', true);
+        }
+    }
+
+    function showToastMessage(msg, isError = false) {
+        const toast = document.getElementById('toastMessage');
+        toast.innerText = msg;
+        toast.style.backgroundColor = isError ? '#b91c1c' : '#0f172a';
+        toast.style.opacity = '1';
+        setTimeout(() => {
+            toast.style.opacity = '0';
+        }, 2800);
+    }
+
+    function appendLiveChatMessage(message) {
+        const list = document.getElementById('liveChatList');
+        if (!list) return;
+        const chatItem = document.createElement('div');
+        chatItem.className = 'chat-message';
+        chatItem.innerHTML = `<strong>${escapeHtml(message.userName || 'Guest')}</strong><span>${escapeHtml(message.message)}</span>`;
+        list.appendChild(chatItem);
+        list.scrollTop = list.scrollHeight;
+    }
+
+    function clearLiveChat() {
+        const list = document.getElementById('liveChatList');
+        if (list) list.innerHTML = '';
+    }
+
+    function openLiveRoom(session) {
+        if (!session) return;
+        currentLiveSession = session;
+        const container = document.getElementById('liveRoomContainer');
+        const title = document.getElementById('liveRoomTitle');
+        const meta = document.getElementById('liveRoomMeta');
+        const viewerCount = document.getElementById('liveViewerCount');
+        const endBtn = document.getElementById('endLiveBtn');
+
+        if (title) title.innerText = session.title || 'Live Stream';
+        if (meta) meta.innerText = `Hosted by ${session.seller?.storeName || session.seller?.name || 'Seller'}`;
+        if (viewerCount) viewerCount.innerText = `${session.viewerCount || 0} viewers`;
+        if (endBtn) {
+            endBtn.style.display = currentUser?.id == session.seller?.id ? 'inline-flex' : 'none';
+        }
+        if (container) container.style.display = 'block';
+
+        clearLiveChat();
+        const chatInput = document.getElementById('liveChatInput');
+        if (chatInput) chatInput.value = '';
+    }
+
+    function closeLiveRoom() {
+        const container = document.getElementById('liveRoomContainer');
+        if (container) container.style.display = 'none';
+        if (socket && currentLiveSession) {
+            socket.emit('leaveLive', currentLiveSession.id, currentUser?.id);
+        }
+        currentLiveSession = null;
+        clearLiveChat();
+    }
+
+    function sendLiveChat() {
+        const input = document.getElementById('liveChatInput');
+        if (!input || !input.value.trim() || !currentLiveSession) return;
+        const message = input.value.trim();
+        const payload = {
+            liveSessionId: currentLiveSession.id,
+            userId: currentUser?.id,
+            userName: currentUser?.name || 'Guest',
+            message
+        };
+        if (socket) {
+            socket.emit('liveChat', payload);
+            appendLiveChatMessage(payload);
+            input.value = '';
+        }
+    }
+
+    function escapeHtml(str) { 
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    
+    const modal = document.getElementById('createModal');
+    const createBtn = document.getElementById('createLiveBtn');
+    const cancelBtn = document.getElementById('cancelModalBtn');
+    const confirmBtn = document.getElementById('confirmCreateLive');
+
+    function openModal() { if(modal) modal.style.display = 'flex'; }
+    function closeModal() { if(modal) modal.style.display = 'none'; }
+
+    if (createBtn) createBtn.addEventListener('click', () => {
+        if (!currentUser) { showToastMessage('Login first to go live', true); window.location.href='login.html'; return; }
+        if (currentUser.role !== 'seller') { showToastMessage('Only sellers can start live streams', true); return; }
+        openModal();
+    });
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => {
+            const title = document.getElementById('liveTitle').value.trim();
+            const desc = document.getElementById('liveDesc').value.trim();
+            if (!title) { showToastMessage('Please add a session title', true); return; }
+            createLiveSession(title, desc);
+            document.getElementById('liveTitle').value = '';
+            document.getElementById('liveDesc').value = '';
+        });
+    }
+    document.getElementById('leaveLiveBtn')?.addEventListener('click', closeLiveRoom);
+    document.getElementById('sendLiveChatBtn')?.addEventListener('click', sendLiveChat);
+    document.getElementById('liveChatInput')?.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') sendLiveChat();
+    });
+    document.getElementById('leaveLiveBtn')?.addEventListener('click', closeLiveRoom);
+    document.getElementById('sendLiveChatBtn')?.addEventListener('click', sendLiveChat);
+    document.getElementById('liveChatInput')?.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') sendLiveChat();
+    });
+    window.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+    
+    document.addEventListener('DOMContentLoaded', async () => {
+        highlightNav('live');
+        setUserUI();
+        await loadLiveSessions();
+        
+        setInterval(() => {
+            if (document.visibilityState === 'visible') loadLiveSessions();
+        }, 20000);
+    });
+</script>
+</body>
+</html>
