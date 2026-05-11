@@ -27,8 +27,12 @@ const connectDB = async () => {
     await sequelize.sync({ alter: true });
     console.log('All models synced');
   } catch (error) {
-    console.error('Unable to connect to database:', error);
-    process.exit(1);
+    console.error('Unable to connect to database:', error.message);
+    console.warn('Database connection failed. API will continue running without database.');
+    console.warn('Please check your database configuration and ensure:');
+    console.warn(`  - Database host is reachable: ${process.env.DB_HOST}:3306`);
+    console.warn(`  - Database credentials are correct (user: ${process.env.DB_USER})`);
+    console.warn(`  - Database name exists: ${process.env.DB_NAME}`);
   }
 };
 
