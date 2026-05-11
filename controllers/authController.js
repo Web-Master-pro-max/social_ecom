@@ -136,14 +136,19 @@ exports.changePassword = async (req, res) => {
       return res.status(401).json({ message: 'Current password is incorrect' });
     }
 
-    // Update password
-    await User.update(
-      { password: newPassword },
-      { where: { id: req.user.id } }
-    );
+    // Check if new password is same as old
+    const isSameAsOld = await user.comparePassword(newPassword);
+    if (isSameAsOld) {
+      return res.status(400).json({ message: 'New password must be different from current password' });
+    }
+
+    // Update password - this will trigger the beforeUpdate hook for hashing
+    user.password = newPassword;
+    await user.save();
 
     res.json({ success: true, message: 'Password changed successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Change password error:', error);
+    res.status(500).json({ message: 'Error changing password: ' + error.message });
   }
 };

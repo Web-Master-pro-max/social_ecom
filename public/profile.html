@@ -1058,16 +1058,31 @@
         }
 
         try {
+            const headers = authHeaders();
+            console.log('Sending request with headers:', headers);
+            console.log('API URL:', `${API_URL}/auth/change-password`);
+            
             const response = await fetch(`${API_URL}/auth/change-password`, {
                 method: 'POST',
-                headers: authHeaders(),
+                headers: headers,
                 body: JSON.stringify({
                     currentPassword,
                     newPassword
                 })
             });
 
-            const data = await response.json();
+            // Check if response is actually JSON
+            const contentType = response.headers.get('content-type');
+            let data;
+            
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                console.error('Unexpected response format:', text);
+                showToastMessage('Server error - invalid response format', true);
+                return;
+            }
 
             if (!response.ok) {
                 showToastMessage(data.message || 'Failed to change password', true);
@@ -1077,6 +1092,7 @@
             showToastMessage('Password changed successfully!');
             closePasswordModal();
         } catch (error) {
+            console.error('Change password error:', error);
             showToastMessage('Error changing password: ' + error.message, true);
         }
     }
