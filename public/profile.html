@@ -763,6 +763,25 @@
     </div>
 </div>
 
+<div id="passwordModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3><i class="fas fa-lock"></i> Change Password</h3>
+        <div class="input-group">
+            <input type="password" id="currentPassword" placeholder="Current Password">
+        </div>
+        <div class="input-group">
+            <input type="password" id="newPassword" placeholder="New Password (min 6 chars)">
+        </div>
+        <div class="input-group">
+            <input type="password" id="confirmPassword" placeholder="Confirm New Password">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-outline-modern" id="closePasswordModalBtn" style="border-color:#cbd5e1;">Cancel</button>
+            <button class="btn-primary-modern" id="savePasswordBtn">Change Password</button>
+        </div>
+    </div>
+</div>
+
 <div id="toastMsg" class="toast-message"></div>
 
 <script src="cart.js"></script>
@@ -835,10 +854,15 @@
     async function fetchUserStats() {
         try {
             const endpoint = currentUser?.role === 'seller' ? 'seller-orders' : 'my-orders';
-            const data = await fetchJSON(`${API_URL}/orders/${endpoint}`, { headers: authHeaders() });
-            const orders = data.orders || data || [];
+            const response = await fetchJSON(`${API_URL}/orders/${endpoint}`, { headers: authHeaders() });
+            // API returns array directly, not wrapped in object
+            const orders = Array.isArray(response) ? response : (response.orders || []);
             ordersCount = orders.length;
-            totalSpent = orders.reduce((sum, o) => sum + (o.totalAmount || o.total || 0), 0);
+            // Correctly sum totalAmount from all orders
+            totalSpent = orders.reduce((sum, o) => {
+                const amount = parseFloat(o.totalAmount) || parseFloat(o.total) || 0;
+                return sum + (isNaN(amount) ? 0 : amount);
+            }, 0);
             
             
             const wishlistData = await fetchJSON(`${API_URL}/wishlist/count`, { headers: authHeaders() }).catch(() => ({ count: 0 }));
@@ -920,6 +944,7 @@
                     <div class="action-buttons">
                         <button class="btn-primary-modern" id="goToOrdersBtn"><i class="fas fa-truck"></i> My Orders</button>
                         ${currentUser.role === 'seller' ? `<button class="btn-primary-modern" id="goToSellerDashboardBtn"><i class="fas fa-store"></i> Seller Hub</button>` : ''}
+                        <button class="btn-primary-modern" id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
                         <button class="btn-outline-modern" id="logoutBtnProfile"><i class="fas fa-sign-out-alt"></i> Logout</button>
                     </div>
                     
@@ -935,6 +960,9 @@
         });
         document.getElementById('goToSellerDashboardBtn')?.addEventListener('click', () => {
             window.location.href = 'seller.html';
+        });
+        document.getElementById('changePasswordBtn')?.addEventListener('click', () => {
+            openPasswordModal();
         });
         document.getElementById('logoutBtnProfile')?.addEventListener('click', () => {
             logout();
@@ -991,6 +1019,68 @@
         if (modal) modal.style.display = 'none';
     }
 
+    function openPasswordModal() {
+        const modal = document.getElementById('passwordModal');
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closePasswordModal() {
+        const modal = document.getElementById('passwordModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    async function changePassword() {
+        const currentPassword = document.getElementById('currentPassword').value.trim();
+        const newPassword = document.getElementById('newPassword').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            showToastMessage('Please fill all password fields', true);
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            showToastMessage('New password must be at least 6 characters', true);
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showToastMessage('New password and confirmation do not match', true);
+            return;
+        }
+
+        if (newPassword === currentPassword) {
+            showToastMessage('New password must be different from current password', true);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/auth/change-password`, {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                showToastMessage(data.message || 'Failed to change password', true);
+                return;
+            }
+
+            showToastMessage('Password changed successfully!');
+            closePasswordModal();
+        } catch (error) {
+            showToastMessage('Error changing password: ' + error.message, true);
+        }
+    }
+
     function showToastMessage(msg, isError = false) {
         const toast = document.getElementById('toastMsg');
         toast.innerText = msg;
@@ -1011,13 +1101,20 @@
         await fetchUserStats();
         
         const modal = document.getElementById('editModal');
+        const passwordModal = document.getElementById('passwordModal');
         const closeBtn = document.getElementById('closeModalBtn');
         const saveBtn = document.getElementById('saveProfileBtn');
+        const closePasswordModalBtn = document.getElementById('closePasswordModalBtn');
+        const savePasswordBtn = document.getElementById('savePasswordBtn');
         
         if (closeBtn) closeBtn.addEventListener('click', closeModal);
         if (saveBtn) saveBtn.addEventListener('click', saveProfileChanges);
+        if (closePasswordModalBtn) closePasswordModalBtn.addEventListener('click', closePasswordModal);
+        if (savePasswordBtn) savePasswordBtn.addEventListener('click', changePassword);
+        
         window.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
+            if (e.target === passwordModal) closePasswordModal();
         });
     });
 </script>
