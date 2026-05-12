@@ -937,6 +937,9 @@
             <button class="btn-primary" id="addToCartBtn" ${!isInStock ? 'disabled' : ''}>
               <i class="fas fa-shopping-cart"></i> Add to Cart
             </button>
+            <button class="btn-primary" id="chatWithSellerBtn" style="background: linear-gradient(95deg, #10b981, #059669); display: none;">
+              <i class="fas fa-comments"></i> Chat with Seller
+            </button>
             <button class="btn-secondary" onclick="window.location.href='products.html'">
               <i class="fas fa-arrow-left"></i> Back
             </button>
@@ -987,9 +990,17 @@
       showToast('✓ Product added to cart!');
     });
 
-    
+    // Show chat button if user is not the seller
+    const chatBtn = document.getElementById('chatWithSellerBtn');
+    if (chatBtn && currentUser && product.sellerId !== currentUser.id) {
+      chatBtn.style.display = 'flex';
+      chatBtn.addEventListener('click', () => {
+        window.location.href = `chat.html?productId=${product.id || product._id}`;
+      });
+    }
+
     const reviewsList = document.getElementById('reviewsList');
-    if (reviews.length === 0) {
+    if (!reviews || reviews.length === 0) {
       reviewsList.innerHTML = '<div class="empty-state" style="padding:1.5rem;">✨ No reviews yet. Be the first to review this product!</div>';
     } else {
       reviewsList.innerHTML = reviews.map(review => `
