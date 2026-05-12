@@ -26,9 +26,9 @@
 
         body {
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            background: linear-gradient(135deg, #008C8C 0%, #FFF8E7 100%);
             min-height: 100vh;
-            color: #0f172a;
+            color: #000000;
             padding-bottom: 70px;
         }
 
@@ -201,7 +201,7 @@
             top: 65px;
             left: 0;
             height: calc(100vh - 65px);
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(0, 0, 0, 0.568);
             backdrop-filter: blur(12px);
             border-right: 1px solid rgba(0, 0, 0, 0.05);
             padding: 1.5rem 0;
@@ -329,7 +329,7 @@
         }
 
         .bottom-nav-item.active {
-            color: #3b82f6;
+            color: #3bf6c7;
             background: #eef2ff;
         }
 
@@ -344,6 +344,147 @@
             .main-content-area {
                 margin-left: 260px;
                 padding: 2rem;
+            }
+        }
+
+        /* Carousel Styles */
+        .carousel-container {
+            position: relative;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0);
+            height: 250px;
+        }
+
+        @media (min-width: 768px) {
+            .carousel-container {
+                height: 350px;
+                border-radius: 2rem;
+            }
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: scroll;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .slide-content {
+            background: rgba(0, 0, 0, 0);
+            backdrop-filter: none;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            color: #ffffff;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        @media (min-width: 768px) {
+            .slide-content {
+                padding: 2rem;
+                max-width: 60%;
+            }
+        }
+
+        .slide-content h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (min-width: 768px) {
+            .slide-content h2 {
+                font-size: 2rem;
+            }
+        }
+
+        .slide-content p {
+            color: #ffffff;
+            font-size: 0.75rem;
+        }
+
+        @media (min-width: 768px) {
+            .slide-content p {
+                font-size: 0.9rem;
+            }
+        }
+
+        .carousel-nav {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .carousel-dot.active {
+            background: #ffffff;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+            z-index: 10;
+        }
+
+        .carousel-button:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .carousel-button.prev {
+            left: 10px;
+        }
+
+        .carousel-button.next {
+            right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-button {
+                width: 35px;
+                height: 35px;
+                font-size: 0.8rem;
             }
         }
 
@@ -835,10 +976,14 @@
     </div>
 
     <main class="main-content-area">
-        <div class="hero-glow">
-            <div><h2 id="heroTitle">Social Commerce, Reimagined 🚀</h2><p id="heroSubtitle">Discover trending items, live sellers, and exclusive deals</p></div>
-            <div class="live-badge"><i class="fas fa-circle" style="color:#ef4444;"></i> 10+ active sellers</div>
+        <!-- Image Carousel -->
+        <div class="carousel-container" id="carouselContainer">
+            <div id="carouselSlides"></div>
+            <button class="carousel-button prev" onclick="changeSlide(-1)">❮</button>
+            <button class="carousel-button next" onclick="changeSlide(1)">❯</button>
+            <div class="carousel-nav" id="carouselNav"></div>
         </div>
+
         <div class="feed-tabs" id="feedTabs">
             <button class="feed-tab active" onclick="switchFeedTab('all', event)">All</button>
             <button class="feed-tab" onclick="switchFeedTab('following', event)">Following</button>
@@ -856,6 +1001,83 @@
 <script src="app.js"></script>
 <script src="cart.js"></script>
 <script>
+    /* Carousel Functionality */
+    let currentSlide = 0;
+    let totalSlides = 0;
+    let autoplayInterval;
+    let carouselBanners = [
+        { image: '../uploads/1.jpeg', title: '', subtitle: '' },
+        { image: '../uploads/2.jpeg', title: '', subtitle: '' },
+        { image: '../uploads/banner3.jpg', title: 'Give a good poster🤬', subtitle: '' },
+        { image: '../uploads/banner4.jpg', title: 'Make with ai bro but give good one that looks good here😑', subtitle: '' }
+    ];
+
+    function initCarousel() {
+        totalSlides = carouselBanners.length;
+        renderCarouselSlides();
+        
+        // Create carousel dots
+        const carouselNav = document.getElementById('carouselNav');
+        carouselNav.innerHTML = '';
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.className = `carousel-dot ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => goToSlide(i);
+            carouselNav.appendChild(dot);
+        }
+        startAutoplay();
+    }
+
+    function renderCarouselSlides() {
+        const slidesContainer = document.getElementById('carouselSlides');
+        slidesContainer.innerHTML = carouselBanners.map((banner, index) => `
+            <div class="carousel-slide ${index === 0 ? 'active' : ''}" style="background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('${banner.image}');">
+                <div class="slide-content">
+                    <h2>${banner.title}</h2>
+                    <p>${banner.subtitle}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function changeSlide(direction) {
+        currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+        updateSlide();
+        resetAutoplay();
+    }
+
+    function goToSlide(index) {
+        currentSlide = index;
+        updateSlide();
+        resetAutoplay();
+    }
+
+    function updateSlide() {
+        // Update slides
+        const slides = document.querySelectorAll('.carousel-slide');
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('active', i === currentSlide);
+        });
+
+        // Update dots
+        const dots = document.querySelectorAll('.carousel-dot');
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentSlide);
+        });
+    }
+
+    function startAutoplay() {
+        autoplayInterval = setInterval(() => {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlide();
+        }, 5000); // Change slide every 5 seconds
+    }
+
+    function resetAutoplay() {
+        clearInterval(autoplayInterval);
+        startAutoplay();
+    }
+
     let currentView = 'feed';
     let currentFeedTab = 'all';
     let allProductsCache = [];
@@ -1021,7 +1243,7 @@
         });
     });
 
-    document.addEventListener('DOMContentLoaded', () => { setUserUI(); switchView('feed'); });
+    document.addEventListener('DOMContentLoaded', () => { setUserUI(); switchView('feed'); initCarousel(); });
     window.switchView = switchView; window.buyNow = buyNow; window.toggleLike = toggleLike; window.joinLiveSession = joinLiveSession; window.openCreatePost = openCreatePost; window.openAddProduct = openAddProduct; window.openStartLive = openStartLive; window.submitPost = submitPost; window.submitProduct = submitProduct; window.closeModal = closeModal; window.switchFeedTab = switchFeedTab; window.toggleChat = toggleChat; window.sendMessage = sendMessage; window.performGlobalSearch = performGlobalSearch; window.logout = logout; window.toggleComments = toggleComments; window.submitComment = submitComment; window.sharePost = sharePost;
 </script>
 </body>
