@@ -637,7 +637,7 @@
 
 <script>
   // API & Auth
-  const API_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api`;
+  const API_URL = `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}/api`;
   let token = localStorage.getItem('token');
   let currentUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
 
@@ -668,7 +668,18 @@
   async function fetchJSON(url, options = {}) {
     const response = await fetch(url, options);
     const json = await response.json().catch(() => null);
-    if (!response.ok) throw new Error((json && json.message) || response.statusText || 'Request failed');
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+        throw new Error('Not authorized, redirecting to login');
+      }
+      if (response.status === 404) {
+        throw new Error((json && json.message) || 'Resource not found');
+      }
+      throw new Error((json && json.message) || response.statusText || 'Request failed');
+    }
     return json;
   }
 
@@ -982,8 +993,15 @@
 
   // Initialization
   async function init() {
-    if (!token || !currentUser) { window.location.href = 'login.html'; return; }
-    if (!productId) { showToast('Product not specified'); setTimeout(() => window.history.back(), 1500); return; }
+    if (!token || !currentUser) {
+      window.location.href = 'login.html';
+      return;
+    }
+    if (!productId) {
+      showToast('Product not specified');
+      setTimeout(() => window.history.back(), 1500);
+      return;
+    }
     
     try {
       const response = await fetchJSON(`${API_URL}/chats/product/${productId}`, {
