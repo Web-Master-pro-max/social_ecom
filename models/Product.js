@@ -62,6 +62,13 @@ const Product = sequelize.define('Product', {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
     field: 'is_available'
+  },
+  condition: {
+    type: DataTypes.STRING,
+    defaultValue: 'New',
+    validate: {
+      isIn: [['New', 'Like New', 'Used']]
+    }
   }
 }, {
   timestamps: true,

@@ -1191,7 +1191,7 @@
 
     function displayModernProducts(products) {
         if (!products.length) { document.getElementById('dynamicContent').innerHTML = '<div class="empty-state">✨ No products yet</div>'; return; }
-        document.getElementById('dynamicContent').innerHTML = `<div class="products-grid-modern">${products.map(p => `<div class="product-card-modern" onclick="buyNow('${p.id || p._id}')"><div class="product-img"><i class="fas fa-box-open fa-3x" style="color:#94a3b8;"></i></div><div class="product-info"><div><strong>${escapeHtml(p.name)}</strong></div><div class="price">₹${p.price}</div><div style="font-size:0.7rem;">${escapeHtml(p.seller?.storeName || '')}</div><button class="btn-buy">Buy Now →</button></div></div>`).join('')}</div>`;
+        document.getElementById('dynamicContent').innerHTML = `<div class="products-grid-modern">${products.map(p => `<div class="product-card-modern" onclick="buyNow('${p.id || p._id}')"><div class="product-img"><i class="fas fa-box-open fa-3x" style="color:#94a3b8;"></i></div><div class="product-info"><div><strong>${escapeHtml(p.name)}</strong></div><div class="price">₹${p.price}</div><div style="font-size:0.7rem;">${escapeHtml(p.seller?.storeName || '')}</div>${p.condition ? `<div style="font-size:0.75rem; color:#6366f1; font-weight:600; margin-top:0.3rem;">📦 ${escapeHtml(p.condition)}</div>` : ''}<button class="btn-buy">Buy Now →</button></div></div>`).join('')}</div>`;
     }
 
     async function loadLiveSessions() {

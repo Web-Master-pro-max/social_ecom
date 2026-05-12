@@ -929,6 +929,8 @@
             ${product.comparePrice ? `<span class="original-price">₹${Number(product.comparePrice).toLocaleString('en-IN')}</span>` : ''}
           </div>
 
+          ${product.condition ? `<div style="font-size:0.9rem; color:#6366f1; font-weight:600; margin-top:0.8rem; padding:0.6rem 1rem; background:#eef2ff; border-radius:0.8rem; display:inline-block;"><i class="fas fa-box"></i> Condition: ${escapeHtml(product.condition)}</div>` : ''}
+
           <div class="description">${escapeHtml(product.description || 'No description available for this product.')}</div>
 
           <div class="action-buttons">

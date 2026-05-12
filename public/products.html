@@ -876,6 +876,7 @@
         const price = product.price || 0;
         const sellerName = product.seller?.storeName || product.seller?.name || 'Apna Seller';
         const category = product.category || 'General';
+        const condition = product.condition || 'New';
         const formattedPrice = Number(price).toLocaleString('en-IN');
         const imageUrl = Array.isArray(product.images) ? product.images[0] : (typeof product.images === 'string' ? product.images : null);
         const hasImage = !!imageUrl;
@@ -889,6 +890,7 @@
                 <div class="product-info">
                     <div class="product-title">${escapeHtml(name)}</div>
                     <div class="product-store"><i class="fas fa-store-alt"></i> ${escapeHtml(sellerName)}</div>
+                    <div style="font-size:0.75rem; color:#6366f1; font-weight:600; margin-top:0.3rem;">📦 ${escapeHtml(condition)}</div>
                     <div class="price-row">
                         <span class="product-price">₹${formattedPrice}</span>
                         <button class="btn-buy-modern buy-now-btn" data-id="${id}"><i class="fas fa-bolt"></i> Buy</button>

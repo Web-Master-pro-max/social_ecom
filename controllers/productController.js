@@ -26,6 +26,7 @@ exports.createProduct = async (req, res) => {
       stock: parseInt(req.body.stock, 10) || 0,
       isAvailable: req.body.isAvailable === 'true' || req.body.isAvailable === true,
       images,
+      condition: req.body.condition || 'New',
       sellerId: req.user.id
     };
 
@@ -115,7 +116,8 @@ exports.updateProduct = async (req, res) => {
       price: parseFloat(req.body.price) || 0,
       stock: parseInt(req.body.stock, 10) || 0,
       isAvailable: req.body.isAvailable === 'true' || req.body.isAvailable === true,
-      images
+      images,
+      condition: req.body.condition || 'New'
     };
 
     const [updated] = await Product.update(payload, {
