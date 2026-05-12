@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <title>Apna Market — Messages</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      min-height: 100vh;
+      color: #0f172a;
+      padding-bottom: 70px;
+    }
+
+    @media (min-width: 900px) {
+      body {
+        padding-bottom: 0;
+      }
+    }
+
+    /* Modern Glass Navbar */
+    .glass-nav {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    @media (min-width: 768px) {
+      .glass-nav {
+        padding: 0.8rem 2rem;
+      }
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      background: linear-gradient(125deg, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      cursor: pointer;
+    }
+
+    @media (min-width: 768px) {
+      .brand {
+        font-size: 1.5rem;
+        gap: 12px;
+      }
+    }
+
+    .brand i {
+      background: none;
+      -webkit-background-clip: unset;
+      color: #3b82f6;
+    }
+
+    .search-box {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 60px;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      width: 200px;
+    }
+
+    @media (min-width: 500px) {
+      .search-box {
+        width: 250px;
+      }
+    }
+
+    .search-box i {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+    }
+
+    .search-box input {
+      background: transparent;
+      border: none;
+      color: white;
+      outline: none;
+      width: 100%;
+      font-size: 0.85rem;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 60px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Main Container */
+    .page-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .page-container {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    /* Header */
+    .page-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .page-header h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @media (min-width: 768px) {
+      .page-header h1 {
+        font-size: 2rem;
+      }
+    }
+
+    .page-header p {
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+    }
+
+    /* Chat List */
+    .chats-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .chat-item {
+      background: white;
+      border-radius: 1rem;
+      padding: 0.8rem;
+      display: flex;
+      gap: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    @media (min-width: 480px) {
+      .chat-item {
+        padding: 1rem;
+        gap: 1rem;
+      }
+    }
+
+    .chat-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -12px rgba(59, 130, 246, 0.15);
+      border-color: #e0e7ff;
+    }
+
+    .chat-avatar {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(145deg, #eef2ff, #e0e7ff);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #3b82f6;
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 480px) {
+      .chat-avatar {
+        width: 56px;
+        height: 56px;
+        font-size: 1.3rem;
+      }
+    }
+
+    .chat-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .chat-name {
+      font-weight: 700;
+      color: #0f172a;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    @media (min-width: 480px) {
+      .chat-name {
+        font-size: 1rem;
+        max-width: 200px;
+      }
+    }
+
+    .chat-time {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+
+    .chat-message {
+      font-size: 0.8rem;
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chat-product {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.2rem;
+    }
+
+    .product-badge {
+      background: #f1f5f9;
+      color: #475569;
+      padding: 0.2rem 0.6rem;
+      border-radius: 0.5rem;
+      font-size: 0.65rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chat-unread {
+      background: #3b82f6;
+      color: white;
+      min-width: 24px;
+      height: 24px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0 6px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: white;
+      border-radius: 1.2rem;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 0.8rem;
+      color: #cbd5e1;
+    }
+
+    .empty-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .empty-text {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .empty-btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 60px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: 0.2s;
+    }
+
+    .empty-btn:hover {
+      background: #2563eb;
+      transform: scale(0.98);
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #64748b;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 0.8rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: white;
+      padding: 0.7rem 1.2rem;
+      border-radius: 60px;
+      font-size: 0.8rem;
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    @media (min-width: 768px) {
+      .toast {
+        bottom: 30px;
+      }
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 16px 20px;
+      z-index: 100;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (min-width: 900px) {
+      .bottom-nav {
+        display: none;
+      }
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: 0.2s;
+      padding: 6px 12px;
+      border-radius: 40px;
+    }
+
+    .bottom-nav-item i {
+      font-size: 1.3rem;
+    }
+
+    .bottom-nav-item.active {
+      color: #3b82f6;
+      background: #eef2ff;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="glass-nav">
+  <div class="nav-container">
+    <div class="brand" onclick="window.location.href='index.html';">
+      <i class="fas fa-store"></i> Apna Market
+    </div>
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search chats..." onkeyup="searchChats()">
+    </div>
+    <button class="nav-btn" onclick="window.location.href='index.html';">
+      <i class="fas fa-home"></i> Home
+    </button>
+  </div>
+</nav>
+
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-comments"></i> Messages</h1>
+    <p>Your conversations with sellers</p>
+  </div>
+
+  <div class="chats-grid" id="chatsGrid">
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading your chats...</p>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <button class="bottom-nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+  <button class="bottom-nav-item active"><i class="fas fa-comments"></i><span>Chats</span></button>
+  <button class="bottom-nav-item" onclick="window.location.href='products.html'"><i class="fas fa-box"></i><span>Products</span></button>
+  <button class="bottom-nav-item" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-cart"></i><span>Cart</span></button>
+  <button class="bottom-nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>Profile</span></button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // --------------------------------------------------------------
+  // ENHANCED CHAT LIST PAGE
+  // --------------------------------------------------------------
+  const API_URL = window.location.origin + '/api';
+  let token = localStorage.getItem('token');
+  let currentUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+
+  let allChats = [];
+  let socket = null;
+
+  // Helper functions
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+  }
+
+  function formatTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return 'now';
+    if (diffMins < 60) return `${diffMins}m`;
+    if (diffHours < 24) return `${diffHours}h`;
+    if (diffDays < 7) return `${diffDays}d`;
+    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  async function fetchJSON(url, options = {}) {
+    const response = await fetch(url, options);
+    const json = await response.json().catch(() => null);
+    if (!response.ok) throw new Error((json && json.message) || response.statusText || 'Request failed');
+    return json;
+  }
+
+  // Authentication redirect
+  function ensureAuth() {
+    if (!token || !currentUser) {
+      window.location.href = 'login.html';
+      return false;
+    }
+    return true;
+  }
+
+  // Socket initialization for real-time notifications
+  function initSocket() {
+    if (!currentUser || socket) return;
+
+    socket = io();
+
+    socket.on('connect', () => {
+      socket.emit('register', currentUser.id);
+    });
+
+    socket.on('incomingChatNotification', (notification) => {
+      showToast(`New message from ${notification.senderName}: ${notification.message || '📎'}`);
+      loadChats(); // refresh list immediately
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
+  }
+
+  // Load chats from API
+  async function loadChats() {
+    if (!ensureAuth()) return;
+
+    const grid = document.getElementById('chatsGrid');
+    grid.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading your chats...</p></div>';
+
+    try {
+      const data = await fetchJSON(`${API_URL}/chats?limit=50`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      allChats = data.chats || [];
+      renderChats(allChats);
+    } catch (error) {
+      console.error(error);
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">⚠️</div>
+          <div class="empty-title">Unable to load chats</div>
+          <div class="empty-text">${escapeHtml(error.message)}</div>
+          <button class="empty-btn" onclick="loadChats()">Retry</button>
+        </div>
+      `;
+    }
+  }
+
+  // Render chat list with search filter
+  function renderChats(chats) {
+    const grid = document.getElementById('chatsGrid');
+    const searchQuery = document.getElementById('searchInput')?.value.toLowerCase() || '';
+
+    let filtered = chats;
+    if (searchQuery) {
+      filtered = chats.filter(chat => {
+        const otherUser = chat.participant1Id === currentUser.id ? chat.participant2 : chat.participant1;
+        const product = chat.product;
+        const name = (otherUser.storeName || otherUser.name).toLowerCase();
+        const productName = product ? product.name.toLowerCase() : '';
+        return name.includes(searchQuery) || productName.includes(searchQuery);
+      });
+    }
+
+    if (!filtered.length) {
+      if (chats.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">💬</div>
+            <div class="empty-title">No conversations yet</div>
+            <div class="empty-text">Start chatting with sellers about their products!</div>
+            <button class="empty-btn" onclick="window.location.href='products.html'">
+              <i class="fas fa-shopping-bag"></i> Browse Products
+            </button>
+          </div>
+        `;
+      } else {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-title">No matching chats</div>
+            <div class="empty-text">Try a different search term</div>
+            <button class="empty-btn" onclick="clearSearch()">Clear search</button>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    grid.innerHTML = filtered.map(chat => {
+      const otherUser = chat.participant1Id === currentUser.id ? chat.participant2 : chat.participant1;
+      const product = chat.product;
+      const lastTime = formatTime(chat.lastMessageTime);
+      const lastMsg = chat.lastMessage || 'No messages yet';
+      const avatarInitial = (otherUser.storeName || otherUser.name).charAt(0).toUpperCase();
+      const productBadge = product ? `<span class="product-badge"><i class="fas fa-tag"></i> ${escapeHtml(product.name.slice(0, 25))}${product.name.length > 25 ? '…' : ''}</span>` : '';
+      
+      return `
+        <div class="chat-item" onclick="openChat(${chat.id})">
+          <div class="chat-avatar">${avatarInitial}</div>
+          <div class="chat-content">
+            <div class="chat-header">
+              <div class="chat-name">${escapeHtml(otherUser.storeName || otherUser.name)}</div>
+              <div class="chat-time">${lastTime}</div>
+            </div>
+            <div class="chat-message">${escapeHtml(lastMsg)}</div>
+            ${productBadge ? `<div class="chat-product">${productBadge}</div>` : ''}
+          </div>
+          ${chat.unreadCount > 0 ? `<div class="chat-unread">${chat.unreadCount > 9 ? '9+' : chat.unreadCount}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Open chat detail page
+  function openChat(chatId) {
+    const chat = allChats.find(c => c.id === chatId);
+    if (chat && chat.product) {
+      window.location.href = `chat.html?productId=${chat.product.id}`;
+    } else {
+      showToast('Unable to open chat');
+    }
+  }
+
+  // Search handler
+  function searchChats() {
+    renderChats(allChats);
+  }
+
+  function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    renderChats(allChats);
+  }
+
+  // Auto-refresh on visibility change (optional)
+  let refreshInterval = null;
+  function startAutoRefresh() {
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        loadChats();
+      }
+    }, 30000);
+  }
+
+  // Initial load
+  document.addEventListener('DOMContentLoaded', () => {
+    if (ensureAuth()) {
+      loadChats();
+      initSocket();
+      startAutoRefresh();
+    }
+  });
+
+  // Expose functions for inline handlers
+  window.openChat = openChat;
+  window.searchChats = searchChats;
+  window.clearSearch = clearSearch;
+  window.loadChats = loadChats;
+</script>
+</body>
+</html>

@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <title>Apna Market — Chat</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f1f5f9;
+      min-height: 100vh;
+      color: #0f172a;
+    }
+
+    /* Main container */
+    .chat-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Header */
+    .chat-header {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 60px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(0.98);
+    }
+
+    .seller-info {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .seller-avatar {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(145deg, #3b82f6, #2563eb);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: white;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .seller-details h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .seller-status {
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .online-indicator {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+    }
+
+    .offline-indicator {
+      width: 8px;
+      height: 8px;
+      background: #94a3b8;
+      border-radius: 50%;
+    }
+
+    /* Product Banner */
+    .product-info-banner {
+      background: #f8fafc;
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .product-info-banner:hover {
+      background: #f1f5f9;
+      padding-left: 1.2rem;
+    }
+
+    .product-img-thumb {
+      width: 52px;
+      height: 52px;
+      background: #e2e8f0;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .product-img-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .product-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-price {
+      color: #3b82f6;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    /* Messages Container */
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      background: #ffffff;
+    }
+
+    /* Message Bubbles */
+    .message {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+
+    .message.sent {
+      justify-content: flex-end;
+    }
+
+    .message-bubble {
+      max-width: 75%;
+      padding: 0.7rem 1rem;
+      border-radius: 1.2rem;
+      word-wrap: break-word;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .message.sent .message-bubble {
+      background: #3b82f6;
+      color: white;
+      border-bottom-right-radius: 0.3rem;
+    }
+
+    .message.received .message-bubble {
+      background: #f1f5f9;
+      color: #0f172a;
+      border-bottom-left-radius: 0.3rem;
+    }
+
+    .message-image {
+      max-width: 240px;
+      border-radius: 0.8rem;
+      margin-bottom: 0.4rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .message-image:hover {
+      transform: scale(1.01);
+    }
+
+    .message-time {
+      font-size: 0.65rem;
+      color: rgba(0, 0, 0, 0.4);
+      margin-top: 0.3rem;
+      text-align: right;
+    }
+
+    .message.sent .message-time {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #f1f5f9;
+      padding: 0.5rem 1rem;
+      border-radius: 1rem;
+      width: fit-content;
+      margin-bottom: 0.5rem;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #94a3b8;
+      border-radius: 50%;
+      animation: typingBounce 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-8px); opacity: 1; }
+    }
+
+    /* Input Area */
+    .input-area {
+      border-top: 1px solid #e2e8f0;
+      padding: 0.8rem 1rem;
+      background: white;
+      display: flex;
+      gap: 0.8rem;
+      align-items: flex-end;
+    }
+
+    .input-actions {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-btn:hover {
+      background: #f1f5f9;
+      color: #3b82f6;
+    }
+
+    .icon-btn.send {
+      color: #3b82f6;
+    }
+
+    .icon-btn.send:hover {
+      background: #eef2ff;
+    }
+
+    .message-input-wrapper {
+      flex: 1;
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-end;
+      background: #f8fafc;
+      border-radius: 60px;
+      padding: 0.2rem 0.2rem 0.2rem 1rem;
+      border: 1px solid #e2e8f0;
+    }
+
+    .message-input-wrapper:focus-within {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .message-input {
+      flex: 1;
+      border: none;
+      padding: 0.6rem 0;
+      font-family: inherit;
+      font-size: 0.9rem;
+      background: transparent;
+      outline: none;
+      resize: none;
+      max-height: 100px;
+    }
+
+    /* Image Preview */
+    .image-preview {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      background: #f1f5f9;
+      border-radius: 0.8rem;
+      overflow: hidden;
+      border: 2px solid #e2e8f0;
+      flex-shrink: 0;
+    }
+
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .image-preview button {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: rgba(0, 0, 0, 0.6);
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #imageInput {
+      display: none;
+    }
+
+    /* Image Modal */
+    .image-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .image-modal.open {
+      display: flex;
+    }
+
+    .image-modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 0.8rem;
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    .image-modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+
+    .image-modal-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: white;
+      padding: 0.7rem 1.2rem;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.25s;
+      pointer-events: none;
+      white-space: nowrap;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (min-width: 768px) {
+      .toast {
+        bottom: 30px;
+      }
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #64748b;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Seller List Styles */
+    .buyer-chat-item {
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      gap: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      align-items: center;
+    }
+
+    .buyer-chat-item:hover {
+      background: #f8fafc;
+    }
+
+    .buyer-avatar {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .buyer-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .buyer-name {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .buyer-message {
+      font-size: 0.85rem;
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .buyer-time {
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 640px) {
+      .chat-header {
+        padding: 0.8rem;
+      }
+      .seller-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+      }
+      .seller-details h3 {
+        font-size: 0.9rem;
+      }
+      .product-info-banner {
+        padding: 0.7rem;
+      }
+      .product-img-thumb {
+        width: 44px;
+        height: 44px;
+      }
+      .message-bubble {
+        max-width: 85%;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.85rem;
+      }
+      .message-image {
+        max-width: 200px;
+      }
+      .input-area {
+        padding: 0.6rem;
+      }
+      .message-input-wrapper {
+        padding-left: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Seller Chat List View (for sellers viewing conversations for a product) -->
+<div class="chat-container" id="sellerChatList" style="display:none;">
+  <div class="chat-header">
+    <button class="back-btn" onclick="goBackFromSellerList()">
+      <i class="fas fa-arrow-left"></i> Back
+    </button>
+    <div class="seller-info">
+      <div>
+        <h3 style="color:white; margin:0;">Buyer Conversations</h3>
+        <p style="color: rgba(255,255,255,0.7); font-size:0.85rem; margin-top:0.2rem;">
+          <span id="productNameHeader"></span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div id="buyerChatsList" style="flex:1; overflow-y:auto;">
+    <div class="loading"><div class="spinner"></div><p>Loading conversations...</p></div>
+  </div>
+</div>
+
+<!-- Single Chat View -->
+<div class="chat-container" id="singleChatView" style="display:none;">
+  <div class="chat-header">
+    <button class="back-btn" onclick="goBackFromChat()">
+      <i class="fas fa-arrow-left"></i> Back
+    </button>
+    <div class="seller-info">
+      <div class="seller-avatar" id="sellerAvatar">S</div>
+      <div class="seller-details">
+        <h3 id="sellerName">Loading...</h3>
+        <div class="seller-status" id="sellerStatus">
+          <span class="offline-indicator" id="statusIndicator"></span>
+          <span id="statusText">Offline</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="product-info-banner" id="productBanner" onclick="openProduct()">
+    <div class="product-img-thumb">
+      <img id="productImg" src="" alt="Product">
+    </div>
+    <div class="product-details">
+      <div class="product-name" id="productName">Product Name</div>
+      <div class="product-price" id="productPrice">₹0</div>
+    </div>
+    <i class="fas fa-chevron-right" style="color:#94a3b8;"></i>
+  </div>
+
+  <div class="messages-container" id="messagesContainer">
+    <div class="loading"><div class="spinner"></div><p>Loading messages...</p></div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-actions">
+      <button class="icon-btn" onclick="document.getElementById('imageInput').click()" title="Upload image">
+        <i class="fas fa-image"></i>
+      </button>
+      <input type="file" id="imageInput" accept="image/*" onchange="handleImageSelect()">
+    </div>
+    <div class="message-input-wrapper" id="messageInputWrapper">
+      <div id="imagePreviewContainer" style="display: flex; align-items: center;"></div>
+      <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." autocomplete="off">
+      <button class="icon-btn send" onclick="sendMessage()" title="Send message">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="image-modal" id="imageModal">
+  <button class="image-modal-close" onclick="closeImageModal()"><i class="fas fa-times"></i></button>
+  <img id="modalImage" src="" alt="Full size">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // API & Auth
+  const API_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api`;
+  let token = localStorage.getItem('token');
+  let currentUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = urlParams.get('productId');
+  
+  let chatId = null;
+  let socket = null;
+  let otherUserId = null;
+  let selectedImage = null;
+  let isLoading = false;
+  let typingTimeout = null;
+
+  // Helper functions
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+  }
+
+  function showToast(message, duration = 2500) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), duration);
+  }
+
+  async function fetchJSON(url, options = {}) {
+    const response = await fetch(url, options);
+    const json = await response.json().catch(() => null);
+    if (!response.ok) throw new Error((json && json.message) || response.statusText || 'Request failed');
+    return json;
+  }
+
+  // Format time for display
+  function formatMessageTime(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Scroll to bottom
+  function scrollToBottom() {
+    const container = document.getElementById('messagesContainer');
+    if (container) container.scrollTop = container.scrollHeight;
+  }
+
+  // Render a single message
+  function renderMessage(message, prepend = false) {
+    const container = document.getElementById('messagesContainer');
+    const isSent = message.senderId === currentUser.id;
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+    
+    let contentHtml = '';
+    if (message.type === 'image' && message.attachment) {
+      contentHtml += `<img src="${escapeHtml(message.attachment)}" alt="Shared image" class="message-image" onclick="openImageModal('${escapeHtml(message.attachment)}')">`;
+    }
+    if (message.message) {
+      contentHtml += `<div>${escapeHtml(message.message)}</div>`;
+    }
+    contentHtml += `<div class="message-time">${formatMessageTime(message.createdAt)}</div>`;
+    
+    msgDiv.innerHTML = `<div class="message-bubble">${contentHtml}</div>`;
+    
+    if (prepend) {
+      container.prepend(msgDiv);
+    } else {
+      container.appendChild(msgDiv);
+      scrollToBottom();
+    }
+  }
+
+  // Load messages history
+  async function loadMessages() {
+    try {
+      const data = await fetchJSON(`${API_URL}/chats/${chatId}/messages?limit=50`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const container = document.getElementById('messagesContainer');
+      container.innerHTML = '';
+      
+      if (!data.messages.length) {
+        container.innerHTML = '<div class="loading" style="flex:1; display:flex; align-items:center; justify-content:center;"><p>✨ No messages yet. Start the conversation!</p></div>';
+        return;
+      }
+      
+      data.messages.forEach(msg => renderMessage(msg, false));
+      scrollToBottom();
+      await markAsRead();
+    } catch (error) {
+      console.error(error);
+      showToast('Failed to load messages', 2000);
+    }
+  }
+
+  // Mark chat as read
+  async function markAsRead() {
+    try {
+      await fetchJSON(`${API_URL}/chats/${chatId}/read`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (error) {
+      console.error('Mark read error:', error);
+    }
+  }
+
+  // Send message (text + image)
+  async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    if (!message && !selectedImage) {
+      showToast('Write a message or add an image');
+      return;
+    }
+    if (isLoading) return;
+    isLoading = true;
+    
+    try {
+      let payload = { message: message || null, type: selectedImage ? 'image' : 'text' };
+      if (selectedImage) payload.attachment = selectedImage;
+      
+      const response = await fetchJSON(`${API_URL}/chats/${chatId}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(payload)
+      });
+      
+      // Emit via socket for real-time
+      if (socket) {
+        socket.emit('sendChatMessage', {
+          chatId,
+          senderId: currentUser.id,
+          message: response.message,
+          type: response.type,
+          attachment: response.attachment
+        });
+      }
+      
+      input.value = '';
+      selectedImage = null;
+      document.getElementById('imagePreviewContainer').innerHTML = '';
+      document.getElementById('imageInput').value = '';
+      // Add the message immediately to UI
+      renderMessage(response, false);
+    } catch (error) {
+      showToast('Failed to send message');
+      console.error(error);
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  // Typing indicator handlers
+  function emitTyping(isTyping) {
+    if (socket && chatId && otherUserId) {
+      socket.emit('typing', { chatId, userId: currentUser.id, isTyping });
+    }
+  }
+
+  function showTypingIndicator() {
+    let indicator = document.getElementById('typingIndicator');
+    if (!indicator) {
+      const container = document.getElementById('messagesContainer');
+      indicator = document.createElement('div');
+      indicator.id = 'typingIndicator';
+      indicator.className = 'typing-indicator';
+      indicator.innerHTML = '<span>Typing</span><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+      container.appendChild(indicator);
+      scrollToBottom();
+    }
+  }
+
+  function hideTypingIndicator() {
+    const indicator = document.getElementById('typingIndicator');
+    if (indicator) indicator.remove();
+  }
+
+  // Socket initialization
+  function initSocket() {
+    if (socket) return;
+    socket = io();
+    socket.emit('register', currentUser.id);
+    socket.emit('joinChat', chatId, currentUser.id);
+    
+    socket.on('newChatMessage', (message) => {
+      renderMessage(message, false);
+      markAsRead();
+    });
+    
+    socket.on('typingIndicator', (data) => {
+      if (data.userId === otherUserId) {
+        if (data.isTyping) showTypingIndicator();
+        else hideTypingIndicator();
+      }
+    });
+    
+    socket.on('userOnline', (userId) => {
+      if (userId === otherUserId) updateStatus(true);
+    });
+    socket.on('userOffline', (userId) => {
+      if (userId === otherUserId) updateStatus(false);
+    });
+  }
+  
+  function updateStatus(isOnline) {
+    const indicator = document.getElementById('statusIndicator');
+    const text = document.getElementById('statusText');
+    if (isOnline) {
+      indicator.className = 'online-indicator';
+      text.textContent = 'Online';
+    } else {
+      indicator.className = 'offline-indicator';
+      text.textContent = 'Offline';
+    }
+  }
+
+  // Product info
+  async function loadProductInfo() {
+    try {
+      const product = await fetchJSON(`${API_URL}/products/${productId}`);
+      document.getElementById('productName').textContent = product.name;
+      document.getElementById('productPrice').textContent = `₹${Number(product.price).toLocaleString('en-IN')}`;
+      if (product.images && product.images.length) {
+        document.getElementById('productImg').src = product.images[0];
+      }
+    } catch (error) {
+      console.error('Product load error', error);
+    }
+  }
+
+  // Open product detail
+  function openProduct() {
+    window.location.href = `product.html?id=${productId}`;
+  }
+
+  // Image handling
+  function handleImageSelect() {
+    const input = document.getElementById('imageInput');
+    const file = input.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select an image file', true);
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Image must be less than 5MB', true);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      selectedImage = e.target.result;
+      const previewDiv = document.getElementById('imagePreviewContainer');
+      previewDiv.innerHTML = `
+        <div class="image-preview">
+          <img src="${selectedImage}" alt="Preview">
+          <button onclick="removeImage()">×</button>
+        </div>
+      `;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeImage() {
+    selectedImage = null;
+    document.getElementById('imageInput').value = '';
+    document.getElementById('imagePreviewContainer').innerHTML = '';
+  }
+
+  // Image modal
+  function openImageModal(src) {
+    const modal = document.getElementById('imageModal');
+    document.getElementById('modalImage').src = src;
+    modal.classList.add('open');
+  }
+  function closeImageModal() {
+    document.getElementById('imageModal').classList.remove('open');
+  }
+
+  // Seller view for multiple buyer chats
+  async function showSellerView(chats) {
+    const product = await fetchJSON(`${API_URL}/products/${productId}`);
+    document.getElementById('productNameHeader').textContent = product.name;
+    const buyerList = document.getElementById('buyerChatsList');
+    buyerList.innerHTML = '';
+    chats.forEach(chat => {
+      const buyer = chat.participant1Id === currentUser.id ? chat.participant2 : chat.participant1;
+      const lastTime = chat.lastMessageTime ? new Date(chat.lastMessageTime).toLocaleString() : '';
+      const div = document.createElement('div');
+      div.className = 'buyer-chat-item';
+      div.onclick = () => openBuyerChat(chat.id);
+      div.innerHTML = `
+        <div class="buyer-avatar">${(buyer.storeName || buyer.name).charAt(0).toUpperCase()}</div>
+        <div class="buyer-info">
+          <div class="buyer-name">${escapeHtml(buyer.storeName || buyer.name)}</div>
+          <div class="buyer-message">${escapeHtml(chat.lastMessage || 'Start chatting')}</div>
+        </div>
+        <div class="buyer-time">${lastTime}</div>
+      `;
+      buyerList.appendChild(div);
+    });
+    document.getElementById('sellerChatList').style.display = 'flex';
+    document.getElementById('singleChatView').style.display = 'none';
+  }
+
+  async function openBuyerChat(selectedChatId) {
+    chatId = selectedChatId;
+    const allChats = await fetchJSON(`${API_URL}/chats?limit=100`, { headers: { Authorization: `Bearer ${token}` } });
+    const chat = allChats.chats.find(c => c.id === chatId);
+    if (!chat) return;
+    otherUserId = chat.participant1Id === currentUser.id ? chat.participant2Id : chat.participant1Id;
+    const otherUser = chat.participant1Id === currentUser.id ? chat.participant2 : chat.participant1;
+    document.getElementById('sellerName').textContent = otherUser.storeName || otherUser.name;
+    document.getElementById('sellerAvatar').textContent = (otherUser.storeName || otherUser.name).charAt(0).toUpperCase();
+    await loadProductInfo();
+    await loadMessages();
+    initSocket();
+    document.getElementById('singleChatView').style.display = 'flex';
+    document.getElementById('sellerChatList').style.display = 'none';
+  }
+
+  // Back navigation
+  function goBackFromChat() {
+    if (document.getElementById('sellerChatList').style.display === 'flex') {
+      document.getElementById('singleChatView').style.display = 'none';
+      document.getElementById('sellerChatList').style.display = 'flex';
+      if (socket) socket.emit('leaveChat', chatId, currentUser.id);
+    } else {
+      window.history.back();
+    }
+  }
+  function goBackFromSellerList() { window.history.back(); }
+
+  // Initialization
+  async function init() {
+    if (!token || !currentUser) { window.location.href = 'login.html'; return; }
+    if (!productId) { showToast('Product not specified'); setTimeout(() => window.history.back(), 1500); return; }
+    
+    try {
+      const response = await fetchJSON(`${API_URL}/chats/product/${productId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.isSellerView && response.chats) {
+        await showSellerView(response.chats);
+      } else {
+        chatId = response.id;
+        otherUserId = response.participant1Id === currentUser.id ? response.participant2Id : response.participant1Id;
+        const otherUser = response.participant1Id === currentUser.id ? response.participant2 : response.participant1;
+        document.getElementById('sellerName').textContent = otherUser.storeName || otherUser.name;
+        document.getElementById('sellerAvatar').textContent = (otherUser.storeName || otherUser.name).charAt(0).toUpperCase();
+        await loadProductInfo();
+        await loadMessages();
+        initSocket();
+        document.getElementById('singleChatView').style.display = 'flex';
+        document.getElementById('sellerChatList').style.display = 'none';
+      }
+    } catch (error) {
+      showToast('Error loading chat: ' + error.message);
+      console.error(error);
+    }
+  }
+
+  // Typing detection
+  document.getElementById('messageInput')?.addEventListener('input', () => {
+    emitTyping(true);
+    if (typingTimeout) clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => emitTyping(false), 1000);
+  });
+  
+  window.sendMessage = sendMessage;
+  window.handleImageSelect = handleImageSelect;
+  window.removeImage = removeImage;
+  window.openImageModal = openImageModal;
+  window.closeImageModal = closeImageModal;
+  window.openProduct = openProduct;
+  window.goBackFromChat = goBackFromChat;
+  window.goBackFromSellerList = goBackFromSellerList;
+  
+  document.addEventListener('DOMContentLoaded', init);
+  window.addEventListener('beforeunload', () => {
+    if (socket && chatId) socket.emit('leaveChat', chatId, currentUser?.id);
+  });
+</script>
+</body>
+</html>

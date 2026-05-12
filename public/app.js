@@ -34,6 +34,7 @@ function setUserUI() {
     const logoutBtn = document.getElementById('logoutButton');
     const profileLink = document.getElementById('navProfile') || document.getElementById('nav-profile');
     const sellerLink = document.getElementById('navSeller');
+    const chatsLink = document.getElementById('navChats');
     const bottomPostBtn = document.getElementById('navBottomCreatePost');
     const adminLink = document.getElementById('navAdmin') || document.getElementById('nav-admin');
     const loginLink = document.getElementById('navLogin') || document.getElementById('nav-login');
@@ -47,6 +48,9 @@ function setUserUI() {
         }
         if (profileLink) {
             profileLink.style.display = 'inline-flex';
+        }
+        if (chatsLink) {
+            chatsLink.style.display = 'inline-flex';
         }
         if (bottomPostBtn) {
             bottomPostBtn.style.display = currentUser.role === 'seller' ? 'flex' : 'none';
@@ -69,6 +73,9 @@ function setUserUI() {
         }
         if (profileLink) {
             profileLink.style.display = 'none';
+        }
+        if (chatsLink) {
+            chatsLink.style.display = 'none';
         }
         if (adminLink) {
             adminLink.style.display = 'none';
