@@ -76,7 +76,15 @@ exports.getOrCreateProductChat = async (req, res) => {
       });
     }
 
-    res.json(chat);
+    // Return chat with participant info for frontend use
+    const chatWithParticipants = await Chat.findByPk(chat.id, {
+      include: [
+        { model: User, as: 'participant1', attributes: ['id', 'name', 'storeName', 'profilePicture'] },
+        { model: User, as: 'participant2', attributes: ['id', 'name', 'storeName', 'profilePicture'] }
+      ]
+    });
+
+    res.json(chatWithParticipants);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -650,6 +650,7 @@
   let selectedImage = null;
   let isLoading = false;
   let typingTimeout = null;
+  let sellerListActive = false;
 
   // Helper functions
   function escapeHtml(str) {
@@ -834,11 +835,11 @@
       }
     });
     
-    socket.on('userOnline', (userId) => {
-      if (userId === otherUserId) updateStatus(true);
+    socket.on('userOnline', (data) => {
+      if (data?.userId === otherUserId) updateStatus(true);
     });
-    socket.on('userOffline', (userId) => {
-      if (userId === otherUserId) updateStatus(false);
+    socket.on('userOffline', (data) => {
+      if (data?.userId === otherUserId) updateStatus(false);
     });
   }
   
@@ -863,8 +864,10 @@
       if (product.images && product.images.length) {
         document.getElementById('productImg').src = product.images[0];
       }
+      return product;
     } catch (error) {
       console.error('Product load error', error);
+      return null;
     }
   }
 
@@ -938,19 +941,26 @@
       `;
       buyerList.appendChild(div);
     });
+    sellerListActive = true;
     document.getElementById('sellerChatList').style.display = 'flex';
     document.getElementById('singleChatView').style.display = 'none';
   }
 
   async function openBuyerChat(selectedChatId) {
     chatId = selectedChatId;
+    sellerListActive = true;
     const allChats = await fetchJSON(`${API_URL}/chats?limit=100`, { headers: { Authorization: `Bearer ${token}` } });
     const chat = allChats.chats.find(c => c.id === chatId);
-    if (!chat) return;
+    if (!chat) {
+      showToast('Chat not found');
+      return;
+    }
     otherUserId = chat.participant1Id === currentUser.id ? chat.participant2Id : chat.participant1Id;
     const otherUser = chat.participant1Id === currentUser.id ? chat.participant2 : chat.participant1;
-    document.getElementById('sellerName').textContent = otherUser.storeName || otherUser.name;
-    document.getElementById('sellerAvatar').textContent = (otherUser.storeName || otherUser.name).charAt(0).toUpperCase();
+    if (otherUser) {
+      document.getElementById('sellerName').textContent = otherUser.storeName || otherUser.name;
+      document.getElementById('sellerAvatar').textContent = (otherUser.storeName || otherUser.name).charAt(0).toUpperCase();
+    }
     await loadProductInfo();
     await loadMessages();
     initSocket();
@@ -960,13 +970,13 @@
 
   // Back navigation
   function goBackFromChat() {
-    if (document.getElementById('sellerChatList').style.display === 'flex') {
+    if (sellerListActive) {
       document.getElementById('singleChatView').style.display = 'none';
       document.getElementById('sellerChatList').style.display = 'flex';
       if (socket) socket.emit('leaveChat', chatId, currentUser.id);
-    } else {
-      window.history.back();
+      return;
     }
+    window.history.back();
   }
   function goBackFromSellerList() { window.history.back(); }
 
@@ -983,11 +993,22 @@
         await showSellerView(response.chats);
       } else {
         chatId = response.id;
-        otherUserId = response.participant1Id === currentUser.id ? response.participant2Id : response.participant1Id;
-        const otherUser = response.participant1Id === currentUser.id ? response.participant2 : response.participant1;
-        document.getElementById('sellerName').textContent = otherUser.storeName || otherUser.name;
-        document.getElementById('sellerAvatar').textContent = (otherUser.storeName || otherUser.name).charAt(0).toUpperCase();
-        await loadProductInfo();
+        const product = await loadProductInfo();
+        let otherUser = null;
+
+        if (response.participant1 && response.participant2) {
+          otherUserId = response.participant1Id === currentUser.id ? response.participant2Id : response.participant1Id;
+          otherUser = response.participant1Id === currentUser.id ? response.participant2 : response.participant1;
+        } else if (product?.seller) {
+          otherUserId = product.sellerId;
+          otherUser = product.seller;
+        }
+
+        if (otherUser) {
+          document.getElementById('sellerName').textContent = otherUser.storeName || otherUser.name;
+          document.getElementById('sellerAvatar').textContent = (otherUser.storeName || otherUser.name).charAt(0).toUpperCase();
+        }
+
         await loadMessages();
         initSocket();
         document.getElementById('singleChatView').style.display = 'flex';
