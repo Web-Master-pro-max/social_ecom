@@ -583,6 +583,12 @@
             }
         }
 
+        @media (min-width: 500px) {
+            .posts-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
         .post-card-modern {
             background: white;
             border-radius: 1rem;
@@ -1158,6 +1164,7 @@
             const sellerId = p.seller?.id || p.seller?._id;
             const isFollowing = sellerId && followingSellerIds.has(sellerId);
             const product = p.product;
+            const productId = product?.id || product?._id;
             const productImage = product?.images && product.images.length > 0 ? product.images[0] : null;
             return `<div class="post-card-modern">
                 <div class="post-header">
@@ -1167,12 +1174,12 @@
                 <div class="post-content">
                     <p>${escapeHtml(p.content)}</p>
                     ${product ? `
-                        <div class="product-attachment">
+                        <div class="product-attachment" onclick="openProduct('${productId}')" style="cursor:pointer;">
                             ${productImage ? `<img class="product-attachment-img" src="${escapeHtml(productImage)}" alt="${escapeHtml(product.name)}" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">` : `<div class="product-attachment-img" style="display:flex;align-items:center;justify-content:center;"><i class="fas fa-box fa-3x" style="color:#94a3b8;"></i></div>`}
                             <div class="product-attachment-info">
                                 <div class="product-attachment-name">${escapeHtml(product.name)}</div>
                                 <div class="product-attachment-price">₹${product.price}</div>
-                                <button class="product-attachment-shop" onclick="buyNow('${product.id}')">Shop Now →</button>
+                                <button class="product-attachment-shop" type="button" onclick="event.stopPropagation(); openProduct('${productId}')">Shop Now →</button>
                             </div>
                         </div>
                     ` : ''}
@@ -1211,6 +1218,7 @@
     async function joinLiveSession(sessionId) { if (!ensureAuth()) return; try { await fetchJSON(`${API_URL}/live/${sessionId}/join`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } }); showToast('🎉 Joined live!'); } catch(e) { showToast('Error joining', true); } }
     async function toggleLike(postId) { if (!ensureAuth()) return; await fetchJSON(`${API_URL}/likes/toggle`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ postId }) }); loadFeed(); }
     async function buyNow(productId) { if (!ensureAuth()) return; addToCart(parseInt(productId, 10), 1); showToast('Added to cart! Redirecting...'); setTimeout(() => window.location.href = 'checkout.html', 800); }
+    function openProduct(productId) { if (!productId) return; window.location.href = `product.html?id=${productId}`; }
     function performGlobalSearch() { const q = document.getElementById('globalSearch').value; if (currentView === 'products') { const filtered = allProductsCache.filter(p => p.name.toLowerCase().includes(q.toLowerCase())); displayModernProducts(filtered); } else showToast('Search works in Products tab', false); }
     function switchFeedTab(tab, evt) { currentFeedTab = tab; document.querySelectorAll('.feed-tab').forEach(btn => btn.classList.remove('active')); if (evt?.target) evt.target.classList.add('active'); loadFeed(); }
     async function toggleFollowSeller(sellerId) { if (!ensureAuth()) return; const isFollowing = followingSellerIds.has(sellerId); try { await fetchJSON(`${API_URL}/users/${isFollowing ? 'unfollow' : 'follow'}/${sellerId}`, { method: isFollowing ? 'DELETE' : 'POST', headers: { Authorization: `Bearer ${token}` } }); if (isFollowing) followingSellerIds.delete(sellerId); else followingSellerIds.add(sellerId); loadFeed(); } catch(e) { showToast('Unable to update', true); } }
@@ -1252,7 +1260,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => { setUserUI(); switchView('feed'); initCarousel(); });
-    window.switchView = switchView; window.buyNow = buyNow; window.toggleLike = toggleLike; window.joinLiveSession = joinLiveSession; window.openCreatePost = openCreatePost; window.openAddProduct = openAddProduct; window.openStartLive = openStartLive; window.submitPost = submitPost; window.submitProduct = submitProduct; window.closeModal = closeModal; window.switchFeedTab = switchFeedTab; window.toggleChat = toggleChat; window.sendMessage = sendMessage; window.performGlobalSearch = performGlobalSearch; window.logout = logout; window.toggleComments = toggleComments; window.submitComment = submitComment; window.sharePost = sharePost;
+    window.switchView = switchView; window.buyNow = buyNow; window.openProduct = openProduct; window.toggleLike = toggleLike; window.joinLiveSession = joinLiveSession; window.openCreatePost = openCreatePost; window.openAddProduct = openAddProduct; window.openStartLive = openStartLive; window.submitPost = submitPost; window.submitProduct = submitProduct; window.closeModal = closeModal; window.switchFeedTab = switchFeedTab; window.toggleChat = toggleChat; window.sendMessage = sendMessage; window.performGlobalSearch = performGlobalSearch; window.logout = logout; window.toggleComments = toggleComments; window.submitComment = submitComment; window.sharePost = sharePost;
 </script>
 </body>
 </html>
