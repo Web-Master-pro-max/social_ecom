@@ -17,6 +17,21 @@ const Chat = sequelize.define('Chat', {
     allowNull: false,
     field: 'participant2_id'
   },
+  productId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    field: 'product_id'
+  },
+  buyerId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    field: 'buyer_id'
+  },
+  sellerId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    field: 'seller_id'
+  },
   lastMessage: {
     type: DataTypes.TEXT,
     field: 'last_message'

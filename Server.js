@@ -22,6 +22,7 @@ const likeRoutes = require('./routes/likes');
 const orderRoutes = require('./routes/orders');
 const liveRoutes = require('./routes/live');
 const adminRoutes = require('./routes/admin');
+const chatRoutes = require('./routes/chat');
 
 const app = express();
 const server = http.createServer(app);
@@ -80,6 +81,7 @@ app.use('/api/likes', likeRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/live', liveRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/chats', chatRoutes);
 
 
 app.use(express.static(path.join(__dirname, 'public')));

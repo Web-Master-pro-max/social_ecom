@@ -19,11 +19,16 @@ const Message = sequelize.define('Message', {
   },
   message: {
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: true
   },
   type: {
     type: DataTypes.ENUM('text', 'image', 'product'),
     defaultValue: 'text'
+  },
+  attachment: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Image URL or file path'
   },
   productId: {
     type: DataTypes.INTEGER,

@@ -37,6 +37,9 @@ Post.hasMany(Like, { as: 'likes', foreignKey: 'postId' });
 Chat.hasMany(Message, { as: 'messages', foreignKey: 'chatId' });
 Message.belongsTo(Chat, { as: 'chat', foreignKey: 'chatId' });
 Message.belongsTo(User, { as: 'sender', foreignKey: 'senderId' });
+Chat.belongsTo(User, { as: 'participant1', foreignKey: 'participant1Id' });
+Chat.belongsTo(User, { as: 'participant2', foreignKey: 'participant2Id' });
+Chat.belongsTo(Product, { as: 'product', foreignKey: 'productId' });
 
 
 User.hasMany(Order, { as: 'buyerOrders', foreignKey: 'buyerId' });
