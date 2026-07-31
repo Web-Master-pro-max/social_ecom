@@ -816,8 +816,29 @@
     let endDate = '';
     let socket = null;
 
+    function showSkeletonOrdersList() {
+        const container = document.getElementById('ordersContainer');
+        if (!container) return;
+        container.innerHTML = `<div>${[1, 2, 3].map(() => `
+            <div class="skeleton-card" style="margin-bottom: 1.2rem; padding: 1.2rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <div class="skeleton skeleton-title" style="width: 30%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 20%; height: 20px; border-radius: 20px;"></div>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 0.8rem;">
+                    <div class="skeleton skeleton-img" style="width: 60px; height: 60px; border-radius: 8px;"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-title" style="width: 60%;"></div>
+                        <div class="skeleton skeleton-text" style="width: 40%;"></div>
+                    </div>
+                </div>
+            </div>
+        `).join('')}</div>`;
+    }
+
     async function loadOrders() {
         const container = document.getElementById('ordersContainer');
+        showSkeletonOrdersList();
         try {
             const endpoint = currentUser?.role === 'seller' ? 'seller-orders' : 'my-orders';
             const data = await fetchJSON(`${API_URL}/orders/${endpoint}`, {

@@ -9,6 +9,7 @@ const LiveSession = require('./LiveSession');
 const Order = require('./Order');
 const OrderItem = require('./OrderItem');
 const Follow = require('./Follow');
+const Banner = require('./Banner');
 
 
 User.hasMany(Product, { as: 'products', foreignKey: 'sellerId' });
@@ -69,5 +70,6 @@ module.exports = {
   LiveSession,
   Order,
   OrderItem,
-  Follow
+  Follow,
+  Banner
 };

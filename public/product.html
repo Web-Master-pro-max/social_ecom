@@ -876,12 +876,34 @@
     return stars;
   }
 
+  function showSkeletonProductPage() {
+    const container = document.getElementById('productPageContainer');
+    if (!container) return;
+    container.innerHTML = `
+      <div class="product-grid">
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-img" style="height: 380px;"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-title" style="width: 90%; height: 28px; margin-bottom: 1rem;"></div>
+          <div class="skeleton skeleton-text" style="width: 40%; height: 24px; margin-bottom: 1.5rem;"></div>
+          <div class="skeleton skeleton-text" style="width: 100%; height: 16px; margin-bottom: 0.6rem;"></div>
+          <div class="skeleton skeleton-text" style="width: 85%; height: 16px; margin-bottom: 0.6rem;"></div>
+          <div class="skeleton skeleton-text" style="width: 60%; height: 16px; margin-bottom: 1.5rem;"></div>
+          <div class="skeleton skeleton-img" style="height: 48px; border-radius: 30px; margin-top: 2rem;"></div>
+        </div>
+      </div>
+    `;
+  }
+
   async function loadProduct() {
     const container = document.getElementById('productPageContainer');
     if (!productId) {
       container.innerHTML = `<div class="empty-state">Product ID missing</div>`;
       return;
     }
+
+    showSkeletonProductPage();
 
     try {
       const product = await fetchJSON(`${API_URL}/products/${productId}`);

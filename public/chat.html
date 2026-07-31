@@ -854,7 +854,9 @@
   function updateStatus(isOnline) {
     const indicator = document.getElementById('statusIndicator');
     const text = document.getElementById('statusText');
-    if (isOnline) {
+    const name = document.getElementById('sellerName')?.textContent || '';
+    const isAi = name.toLowerCase().includes('ai assistant') || name.toLowerCase().includes('ai bot') || (otherUser && (otherUser.isAiBot || (otherUser.name || '').includes('AI')));
+    if (isOnline || isAi) {
       indicator.className = 'online-indicator';
       text.textContent = 'Online';
     } else {
@@ -1013,6 +1015,7 @@
         
         await loadMessages();
         initSocket();
+        updateStatus(true);
         document.getElementById('singleChatView').style.display = 'flex';
         document.getElementById('sellerChatList').style.display = 'none';
       } catch (error) {

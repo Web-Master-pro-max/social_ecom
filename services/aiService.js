@@ -96,6 +96,33 @@ Return strictly a valid JSON object with keys "specifications", "options", and "
     }
 };
 
+exports.generateBannerContent = async (count = 3) => {
+    try {
+        const prompt = `You are a creative marketing designer for an e-commerce platform called Apna Market.
+Generate a list of ${count} catchy, diverse promotional homepage banners for current sales or featured collections (e.g. Electronics, Fashion, Home Decor, Sports, Beauty).
+Return strictly a valid JSON object with a single key "banners", which is an array of objects.
+Each object in the array must have this structure:
+{
+  "title": "Short catchy banner title (3-6 words, e.g. 'Mega Electronics Festival')",
+  "subtitle": "Engaging subtitle (6-12 words, e.g. 'Upgrade your gear with up to 40% off on top laptops & smartphones!')",
+  "imageTopic": "A 2-4 word phrase for searching/generating a high quality banner image, e.g. 'futuristic laptop neon glow'"
+}`;
+
+        const completion = await groq.chat.completions.create({
+            messages: [{ role: 'user', content: prompt }],
+            model: MODEL,
+            temperature: 0.8,
+            response_format: { type: 'json_object' }
+        });
+
+        const content = completion.choices[0]?.message?.content;
+        return JSON.parse(content);
+    } catch (error) {
+        console.error('Error generating AI banner content:', error);
+        return null;
+    }
+};
+
 exports.generateChatResponse = async (userMessage, chatHistory = []) => {
     try {
         const systemPrompt = {

@@ -945,8 +945,8 @@
             <li><a href="login.html" id="navLogin">Login</a></li>
         </ul>
         <div class="nav-search">
-            <input type="text" id="globalSearch" placeholder="Search...">
-            <button onclick="performGlobalSearch()"><i class="fas fa-search"></i></button>
+            <input type="text" id="globalSearch" placeholder="Search..." oninput="handleGlobalSearchInput()" onkeydown="if(event.key==='Enter'){ event.preventDefault(); performGlobalSearch(); }">
+            <button type="button" onclick="performGlobalSearch()"><i class="fas fa-search"></i></button>
         </div>
         <div class="user-info" id="userInfo" style="display: none;">
             <span id="userName"></span>
@@ -1005,12 +1005,73 @@
 
 
 
+<!-- Floating AI Chat Button -->
+<div class="chat-toggle" id="floatingAiChatBtn" onclick="openAiChat()" title="Chat with AI Assistant">
+    <i class="fas fa-robot fa-lg"></i>
+</div>
+
 <div id="createPostModal" class="modal"><div class="modal-content"><h3>✨ Create Post</h3><textarea id="postContent" class="form-control" rows="3" placeholder="Share something..."></textarea><select id="postProduct" class="form-control"><option value="">Link a product (optional)</option></select><button class="btn-primary" onclick="submitPost()">Post</button><button class="btn" onclick="closeModal('createPostModal')">Cancel</button></div></div>
 <div id="addProductModal" class="modal"><div class="modal-content"><h3>➕ Add Product</h3><input id="productName" class="form-control" placeholder="Name"><input id="productPrice" class="form-control" placeholder="Price" type="number"><textarea id="productDesc" class="form-control" placeholder="Description"></textarea><div style="margin:0.5rem 0; text-align:left;"><label style="font-size:0.8rem; cursor:pointer; color:#0369a1; display:flex; align-items:center; gap:6px;"><input type="checkbox" id="modalAutoEnrich" checked> ✦ Auto-fill specs & features with AI</label></div><button class="btn-primary" onclick="submitProduct()">Add</button><button class="btn" onclick="closeModal('addProductModal')">Cancel</button></div></div>
 
 <script src="app.js"></script>
 <script src="cart.js"></script>
 <script>
+    function performGlobalSearch() {
+        const input = document.getElementById('globalSearch');
+        const query = input ? input.value.trim() : '';
+        if (query) {
+            window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+        } else {
+            window.location.href = 'products.html';
+        }
+    }
+
+    function handleGlobalSearchInput() {
+        const input = document.getElementById('globalSearch');
+        const query = input ? input.value.trim().toLowerCase() : '';
+        if (currentView === 'products' && allProductsCache && allProductsCache.length > 0) {
+            if (!query) {
+                displayModernProducts(allProductsCache);
+                return;
+            }
+            const filtered = allProductsCache.filter(p => 
+                (p.name || '').toLowerCase().includes(query) ||
+                (p.description || '').toLowerCase().includes(query) ||
+                (p.category || '').toLowerCase().includes(query)
+            );
+            displayModernProducts(filtered);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const globalSearchInput = document.getElementById('globalSearch');
+        if (globalSearchInput) {
+            globalSearchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performGlobalSearch();
+                }
+            });
+        }
+    });
+
+    async function openAiChat() {
+        if (!token || !currentUser) {
+            window.location.href = 'login.html';
+            return;
+        }
+        try {
+            const chatData = await fetchJSON(`${API_URL}/chats/ai`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (chatData && chatData.id) {
+                window.location.href = `chat.html?chatId=${chatData.id}`;
+            }
+        } catch (e) {
+            console.error('Error opening AI chat:', e);
+            window.location.href = 'chat-list.html';
+        }
+    }
     /* Carousel Functionality */
     let currentSlide = 0;
     let totalSlides = 0;
@@ -1022,7 +1083,21 @@
         { image: 'img/4.jpeg', title: '', subtitle: '' }
     ];
 
-    function initCarousel() {
+    async function initCarousel() {
+        try {
+            const data = await fetchJSON(`${API_URL}/banners`).catch(() => null);
+            if (data && data.banners && data.banners.length > 0) {
+                carouselBanners = data.banners.map(b => ({
+                    image: b.image,
+                    title: b.title || '',
+                    subtitle: b.subtitle || '',
+                    link: b.link || 'products.html'
+                }));
+            }
+        } catch (e) {
+            console.warn('Could not load AI banners:', e);
+        }
+
         totalSlides = carouselBanners.length;
         renderCarouselSlides();
         
@@ -1041,10 +1116,10 @@
     function renderCarouselSlides() {
         const slidesContainer = document.getElementById('carouselSlides');
         slidesContainer.innerHTML = carouselBanners.map((banner, index) => `
-            <div class="carousel-slide ${index === 0 ? 'active' : ''}" style="background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('${banner.image}');">
-                <div class="slide-content">
-                    <h2>${banner.title}</h2>
-                    <p>${banner.subtitle}</p>
+            <div class="carousel-slide ${index === 0 ? 'active' : ''}" style="background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('${banner.image}'); cursor: pointer;" onclick="window.location.href='${banner.link || 'products.html'}'">
+                <div class="slide-content" style="padding: 2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">
+                    <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">${escapeHtml(banner.title)}</h2>
+                    <p style="font-size: 1rem; opacity: 0.9;">${escapeHtml(banner.subtitle)}</p>
                 </div>
             </div>
         `).join('');
@@ -1140,7 +1215,40 @@
         else if (view === 'live') await loadLiveSessions();
     }
 
+    function showSkeletonFeed() {
+        const container = document.getElementById('dynamicContent');
+        if (!container) return;
+        container.innerHTML = `<div class="posts-grid">${[1, 2, 3].map(() => `
+            <div class="skeleton-card" style="margin-bottom: 1.2rem;">
+                <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 1rem;">
+                    <div class="skeleton skeleton-avatar"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-title" style="width: 40%;"></div>
+                        <div class="skeleton skeleton-text" style="width: 25%;"></div>
+                    </div>
+                </div>
+                <div class="skeleton skeleton-text" style="width: 90%; height: 16px; margin-bottom: 0.5rem;"></div>
+                <div class="skeleton skeleton-text" style="width: 70%; height: 16px; margin-bottom: 1rem;"></div>
+                <div class="skeleton skeleton-img" style="height: 180px;"></div>
+            </div>
+        `).join('')}</div>`;
+    }
+
+    function showSkeletonProducts() {
+        const container = document.getElementById('dynamicContent');
+        if (!container) return;
+        container.innerHTML = `<div class="products-grid-modern" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem;">${[1, 2, 3, 4, 5, 6].map(() => `
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-img" style="height: 140px; margin-bottom: 0.8rem;"></div>
+                <div class="skeleton skeleton-title" style="width: 85%;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%;"></div>
+                <div class="skeleton skeleton-text" style="width: 40%; height: 28px; border-radius: 20px; margin-top: 0.8rem;"></div>
+            </div>
+        `).join('')}</div>`;
+    }
+
     async function loadFeed() {
+        showSkeletonFeed();
         try {
             await loadFollowingSellers();
             const data = await fetchJSON(`${API_URL}/posts?feedType=${currentFeedTab}`, { headers: { Authorization: `Bearer ${token}` } });
@@ -1196,6 +1304,7 @@
     }
 
     async function loadProductsEnhanced() {
+        showSkeletonProducts();
         try { const data = await fetchJSON(`${API_URL}/products`); allProductsCache = data.products || []; displayModernProducts(allProductsCache); } 
         catch(e) { document.getElementById('dynamicContent').innerHTML = '<div class="empty-state">Failed to load products</div>'; }
     }
