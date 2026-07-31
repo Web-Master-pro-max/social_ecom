@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0f172a">
     <title>Apna Market — Social E-commerce | Shop Live, Sell Fast</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <style>
         * {
             margin: 0;
@@ -1006,7 +1006,7 @@
 
 
 <div id="createPostModal" class="modal"><div class="modal-content"><h3>✨ Create Post</h3><textarea id="postContent" class="form-control" rows="3" placeholder="Share something..."></textarea><select id="postProduct" class="form-control"><option value="">Link a product (optional)</option></select><button class="btn-primary" onclick="submitPost()">Post</button><button class="btn" onclick="closeModal('createPostModal')">Cancel</button></div></div>
-<div id="addProductModal" class="modal"><div class="modal-content"><h3>➕ Add Product</h3><input id="productName" class="form-control" placeholder="Name"><input id="productPrice" class="form-control" placeholder="Price" type="number"><textarea id="productDesc" class="form-control" placeholder="Description"></textarea><button class="btn-primary" onclick="submitProduct()">Add</button><button class="btn" onclick="closeModal('addProductModal')">Cancel</button></div></div>
+<div id="addProductModal" class="modal"><div class="modal-content"><h3>➕ Add Product</h3><input id="productName" class="form-control" placeholder="Name"><input id="productPrice" class="form-control" placeholder="Price" type="number"><textarea id="productDesc" class="form-control" placeholder="Description"></textarea><div style="margin:0.5rem 0; text-align:left;"><label style="font-size:0.8rem; cursor:pointer; color:#0369a1; display:flex; align-items:center; gap:6px;"><input type="checkbox" id="modalAutoEnrich" checked> ✦ Auto-fill specs & features with AI</label></div><button class="btn-primary" onclick="submitProduct()">Add</button><button class="btn" onclick="closeModal('addProductModal')">Cancel</button></div></div>
 
 <script src="app.js"></script>
 <script src="cart.js"></script>
@@ -1226,7 +1226,7 @@
     async function loadSellerProductsForSelect() { if (currentUser?.role !== 'seller') return; try { const data = await fetchJSON(`${API_URL}/products/seller/${currentUser.id}`, { headers: { Authorization: `Bearer ${token}` } }); const products = Array.isArray(data) ? data : (data.products || []); const select = document.getElementById('postProduct'); select.innerHTML = '<option value="">No product linked</option>' + products.map(p => `<option value="${p.id || p._id}">${escapeHtml(p.name)}</option>`).join(''); } catch(e) { console.error(e); } }
     async function submitPost() { const content = document.getElementById('postContent').value; const productId = document.getElementById('postProduct').value; if(!content) return showToast('Write something', true); await fetchJSON(`${API_URL}/posts`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ content, productId: productId || null }) }); showToast('Post created!'); closeModal('createPostModal'); loadFeed(); }
     async function openAddProduct() { if (!ensureAuth()) return; document.getElementById('addProductModal').style.display = 'flex'; }
-    async function submitProduct() { const name = document.getElementById('productName').value, price = parseFloat(document.getElementById('productPrice').value), desc = document.getElementById('productDesc').value; if(!name || !price) return showToast('Name & price required', true); await fetchJSON(`${API_URL}/products`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ name, price, description: desc, category: 'General', stock: 1 }) }); showToast('Product added!'); closeModal('addProductModal'); loadProductsEnhanced(); }
+    async function submitProduct() { const name = document.getElementById('productName').value, price = parseFloat(document.getElementById('productPrice').value), desc = document.getElementById('productDesc').value, autoEnrich = document.getElementById('modalAutoEnrich')?.checked; if(!name || !price) return showToast('Name & price required', true); await fetchJSON(`${API_URL}/products`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ name, price, description: desc, category: 'General', stock: 1, autoEnrich }) }); showToast('Product added!'); closeModal('addProductModal'); loadProductsEnhanced(); }
     async function openStartLive() { if (!ensureAuth() || currentUser?.role !== 'seller') return showToast('Only sellers can go live', true); const title = prompt('Live session title:'); if(!title) return; await fetchJSON(`${API_URL}/live`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ title, description: title }) }); showToast('Live session started!'); switchView('live'); }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     function toggleChat() { document.getElementById('chatWidget').classList.toggle('open'); }

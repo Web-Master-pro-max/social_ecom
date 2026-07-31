@@ -90,7 +90,10 @@ async function ensureAiBotUser() {
 }
 
 ensureAdminUser();
-ensureAiBotUser();
+ensureAiBotUser().then(() => {
+  const { startAiWorker } = require('./services/aiWorker');
+  startAiWorker();
+});
 
 
 setupSocketHandlers(io);

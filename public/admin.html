@@ -402,6 +402,7 @@
         </div>
         <div class="action-buttons-group">
             <button class="btn-modern btn-primary" id="addProductQuickBtn"><i class="fas fa-plus-circle"></i> Add Product</button>
+            <button class="btn-modern btn-primary" id="generateAiProductsBtn" style="background: linear-gradient(95deg, #10b981, #059669);"><i class="fas fa-robot"></i> AI Products</button>
             <button class="btn-modern btn-secondary" id="refreshDashboardBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
             <button class="btn-modern btn-outline" id="adminLogoutBtn"><i class="fas fa-sign-out-alt"></i> Exit</button>
         </div>
@@ -477,7 +478,7 @@
 
 
 <div id="productModal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card" style="max-height:90vh; overflow-y:auto;">
         <h3 id="modalTitle">Add Product</h3>
         <div class="form-group"><input type="text" id="prodName" placeholder="Product Name"></div>
         <div class="form-group"><textarea id="prodDesc" rows="2" placeholder="Description"></textarea></div>
@@ -485,6 +486,16 @@
         <div class="form-group"><input type="number" id="prodStock" placeholder="Stock Quantity"></div>
         <div class="form-group"><input type="text" id="prodCategory" placeholder="Category (Electronics, Fashion...)"></div>
         <div class="form-group"><input type="text" id="prodSellerId" placeholder="Seller ID (optional)"></div>
+        
+        <div class="form-group" style="background:#f0f9ff; padding:0.6rem 1rem; border-radius:30px; border:1px solid #bae6fd;">
+            <label style="font-size:0.8rem; cursor:pointer; color:#0369a1; display:flex; align-items:center; gap:6px;">
+                <input type="checkbox" id="prodAutoEnrich" checked> ✦ Auto-fill specs & features with AI
+            </label>
+        </div>
+        
+        <div class="form-group"><textarea id="prodFeatures" rows="2" placeholder="Key Features (Optional, 1 per line)"></textarea></div>
+        <div class="form-group"><textarea id="prodSpecs" rows="2" placeholder='Tech Specs (Optional JSON: {"Brand": "Apple"})'></textarea></div>
+
         <div style="display: flex; gap: 1rem; margin-top: 1rem;">
             <button class="btn-modern btn-primary" id="saveProductBtn">Save</button>
             <button class="btn-modern btn-secondary" id="closeModalBtn">Cancel</button>
@@ -645,6 +656,9 @@
         document.getElementById('prodStock').value = '';
         document.getElementById('prodCategory').value = '';
         document.getElementById('prodSellerId').value = '';
+        if (document.getElementById('prodFeatures')) document.getElementById('prodFeatures').value = '';
+        if (document.getElementById('prodSpecs')) document.getElementById('prodSpecs').value = '';
+        if (document.getElementById('prodAutoEnrich')) document.getElementById('prodAutoEnrich').checked = true;
         document.getElementById('productModal').style.display = 'flex';
     }
 
@@ -655,7 +669,10 @@
             price: parseFloat(document.getElementById('prodPrice').value),
             stock: parseInt(document.getElementById('prodStock').value, 10),
             category: document.getElementById('prodCategory').value.trim() || 'General',
-            sellerId: document.getElementById('prodSellerId').value.trim() || undefined
+            sellerId: document.getElementById('prodSellerId').value.trim() || undefined,
+            autoEnrich: document.getElementById('prodAutoEnrich')?.checked,
+            features: document.getElementById('prodFeatures')?.value.trim() || undefined,
+            specifications: document.getElementById('prodSpecs')?.value.trim() || undefined
         };
         if (!productData.name) { showToast("Product name required", true); return; }
         if (isNaN(productData.price)) { showToast("Valid price required", true); return; }
@@ -730,11 +747,33 @@
     }
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
+    async function generateAiProducts() {
+        const btn = document.getElementById('generateAiProductsBtn');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+        btn.disabled = true;
+        try {
+            const result = await fetchJSON(`${API_URL}/admin/products/generate`, {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify({ count: 5 })
+            });
+            showToast(result.message || 'AI Products generated successfully!');
+            await loadAdminData();
+        } catch (err) {
+            showToast(err.message || 'Failed to generate AI products', true);
+        } finally {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
         if (!ensureAuth()) return;
         if (currentUser.role !== 'admin') { window.location.href = 'index.html'; return; }
         document.getElementById('addProductQuickBtn')?.addEventListener('click', openCreateModal);
         document.getElementById('addProductInlineBtn')?.addEventListener('click', openCreateModal);
+        document.getElementById('generateAiProductsBtn')?.addEventListener('click', generateAiProducts);
         document.getElementById('refreshDashboardBtn')?.addEventListener('click', loadAdminData);
         document.getElementById('adminLogoutBtn')?.addEventListener('click', logout);
         document.getElementById('saveProductBtn')?.addEventListener('click', saveProduct);

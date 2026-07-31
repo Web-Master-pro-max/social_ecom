@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f172a">
   <title>Apna Market — Chat</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
   <style>
     * {
       margin: 0;
@@ -643,6 +643,7 @@
 
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get('productId');
+  const chatIdParam = urlParams.get('chatId');
   
   let chatId = null;
   let socket = null;
@@ -698,8 +699,15 @@
   // Render a single message
   function renderMessage(message, prepend = false) {
     const container = document.getElementById('messagesContainer');
+    
+    // Prevent rendering the exact same message twice
+    if (message.id && document.getElementById(`msg_${message.id}`)) {
+      return; 
+    }
+
     const isSent = message.senderId === currentUser.id;
     const msgDiv = document.createElement('div');
+    if (message.id) msgDiv.id = `msg_${message.id}`;
     msgDiv.className = `message ${isSent ? 'sent' : 'received'}`;
     
     let contentHtml = '';
@@ -776,17 +784,6 @@
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload)
       });
-      
-      // Emit via socket for real-time
-      if (socket) {
-        socket.emit('sendChatMessage', {
-          chatId,
-          senderId: currentUser.id,
-          message: response.message,
-          type: response.type,
-          attachment: response.attachment
-        });
-      }
       
       input.value = '';
       selectedImage = null;
@@ -997,8 +994,36 @@
       window.location.href = 'login.html';
       return;
     }
+
+    if (chatIdParam) {
+      chatId = chatIdParam;
+      document.getElementById('productBanner').style.display = 'none'; // Hide banner for AI/direct chats
+      try {
+        const response = await fetchJSON(`${API_URL}/chats/${chatId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        const otherUser = response.participant1Id === currentUser.id ? response.participant2 : response.participant1;
+        otherUserId = response.participant1Id === currentUser.id ? response.participant2Id : response.participant1Id;
+        
+        if (otherUser) {
+          document.getElementById('sellerName').textContent = otherUser.storeName || otherUser.name;
+          document.getElementById('sellerAvatar').textContent = (otherUser.storeName || otherUser.name).charAt(0).toUpperCase();
+        }
+        
+        await loadMessages();
+        initSocket();
+        document.getElementById('singleChatView').style.display = 'flex';
+        document.getElementById('sellerChatList').style.display = 'none';
+      } catch (error) {
+        showToast('Error loading chat: ' + error.message);
+        console.error(error);
+      }
+      return;
+    }
+    
     if (!productId) {
-      showToast('Product not specified');
+      showToast('Product or Chat not specified');
       setTimeout(() => window.history.back(), 1500);
       return;
     }

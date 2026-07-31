@@ -69,6 +69,36 @@ const Product = sequelize.define('Product', {
     validate: {
       isIn: [['New', 'Like New', 'Used']]
     }
+  },
+  options: {
+    type: DataTypes.TEXT,
+    get() {
+      const rawValue = this.getDataValue('options');
+      return rawValue ? JSON.parse(rawValue) : [];
+    },
+    set(value) {
+      this.setDataValue('options', JSON.stringify(value));
+    }
+  },
+  specifications: {
+    type: DataTypes.TEXT,
+    get() {
+      const rawValue = this.getDataValue('specifications');
+      return rawValue ? JSON.parse(rawValue) : {};
+    },
+    set(value) {
+      this.setDataValue('specifications', JSON.stringify(value));
+    }
+  },
+  features: {
+    type: DataTypes.TEXT,
+    get() {
+      const rawValue = this.getDataValue('features');
+      return rawValue ? JSON.parse(rawValue) : [];
+    },
+    set(value) {
+      this.setDataValue('features', JSON.stringify(value));
+    }
   }
 }, {
   timestamps: true,

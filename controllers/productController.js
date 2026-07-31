@@ -15,8 +15,27 @@ const parseImageField = (field) => {
 exports.createProduct = async (req, res) => {
   try {
     const uploadedImages = (req.files || []).slice(0, 9).map(file => `/uploads/${path.basename(file.path)}`);
-    const existingImages = parseImageField(req.body.existingImages || req.body.images);
-    const images = uploadedImages.length ? uploadedImages : existingImages;
+    const autoEnrich = req.body.autoEnrich === 'true' || req.body.autoEnrich === true || (req.body.autoEnrich === undefined && !req.body.specifications && !req.body.features);
+
+    let specifications = req.body.specifications ? (typeof req.body.specifications === 'string' ? (req.body.specifications.startsWith('{') ? JSON.parse(req.body.specifications) : {}) : req.body.specifications) : null;
+    let options = req.body.options ? (typeof req.body.options === 'string' ? (req.body.options.startsWith('[') ? JSON.parse(req.body.options) : []) : req.body.options) : null;
+    let features = req.body.features ? (typeof req.body.features === 'string' ? (req.body.features.startsWith('[') ? JSON.parse(req.body.features) : req.body.features.split('\n').map(s => s.trim()).filter(Boolean)) : req.body.features) : null;
+
+    if (autoEnrich && (!specifications || !Object.keys(specifications).length || !features || !features.length)) {
+      try {
+        const aiService = require('../services/aiService');
+        const enriched = await aiService.enrichProductDetails({
+          name: req.body.name,
+          category: req.body.category,
+          description: req.body.description
+        });
+        if ((!specifications || !Object.keys(specifications).length) && enriched.specifications) specifications = enriched.specifications;
+        if ((!options || !options.length) && enriched.options) options = enriched.options;
+        if ((!features || !features.length) && enriched.features) features = enriched.features;
+      } catch (e) {
+        console.error('AI enrichment failed during product creation:', e);
+      }
+    }
 
     const payload = {
       name: req.body.name,
@@ -27,6 +46,9 @@ exports.createProduct = async (req, res) => {
       isAvailable: req.body.isAvailable === 'true' || req.body.isAvailable === true,
       images,
       condition: req.body.condition || 'New',
+      options: options || [],
+      specifications: specifications || {},
+      features: features || [],
       sellerId: req.user.id
     };
 

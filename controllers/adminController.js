@@ -69,7 +69,25 @@ exports.getAdminUsers = async (req, res) => {
 
 exports.createAdminProduct = async (req, res) => {
   try {
-    const { sellerId, name, description, price, category, stock, isAvailable } = req.body;
+    const { sellerId, name, description, price, category, stock, isAvailable, autoEnrich: reqAutoEnrich } = req.body;
+    
+    const autoEnrich = reqAutoEnrich === 'true' || reqAutoEnrich === true || (reqAutoEnrich === undefined && !req.body.specifications && !req.body.features);
+
+    let specifications = req.body.specifications ? (typeof req.body.specifications === 'string' ? (req.body.specifications.startsWith('{') ? JSON.parse(req.body.specifications) : {}) : req.body.specifications) : null;
+    let options = req.body.options ? (typeof req.body.options === 'string' ? (req.body.options.startsWith('[') ? JSON.parse(req.body.options) : []) : req.body.options) : null;
+    let features = req.body.features ? (typeof req.body.features === 'string' ? (req.body.features.startsWith('[') ? JSON.parse(req.body.features) : req.body.features.split('\n').map(s => s.trim()).filter(Boolean)) : req.body.features) : null;
+
+    if (autoEnrich && (!specifications || !Object.keys(specifications).length || !features || !features.length)) {
+      try {
+        const enriched = await aiService.enrichProductDetails({ name, category, description });
+        if ((!specifications || !Object.keys(specifications).length) && enriched.specifications) specifications = enriched.specifications;
+        if ((!options || !options.length) && enriched.options) options = enriched.options;
+        if ((!features || !features.length) && enriched.features) features = enriched.features;
+      } catch (e) {
+        console.error('AI enrichment failed during admin product creation:', e);
+      }
+    }
+
     const product = await Product.create({
       sellerId: sellerId || req.user.id,
       name,
@@ -77,6 +95,9 @@ exports.createAdminProduct = async (req, res) => {
       price,
       category,
       stock,
+      options: options || [],
+      specifications: specifications || {},
+      features: features || [],
       isAvailable: isAvailable !== undefined ? isAvailable : true
     });
     res.status(201).json(product);
@@ -221,22 +242,30 @@ exports.generateAiProducts = async (req, res) => {
     }
 
     const createdProducts = [];
+    let allSellers = await User.findAll({ where: { role: 'seller' } });
 
     // 2. Process each generated product
     for (const item of aiData.products) {
-      // Find or create the seller
+      // Find or create the seller, limited to 70 accounts max
       let seller = null;
-      if (item.seller && item.seller.email) {
-        seller = await User.findOne({ where: { email: item.seller.email } });
-        if (!seller) {
-          seller = await User.create({
-            name: item.seller.name || 'AI Seller',
-            email: item.seller.email,
-            password: 'AiSellerPassword123!',
-            role: 'seller',
-            storeName: item.seller.storeName || 'AI Store',
-            bio: item.seller.bio || ''
-          });
+      
+      if (allSellers.length >= 70) {
+        // Exceeded 70 accounts, randomly pick an existing one
+        seller = allSellers[Math.floor(Math.random() * allSellers.length)];
+      } else {
+        if (item.seller && item.seller.email) {
+          seller = await User.findOne({ where: { email: item.seller.email } });
+          if (!seller) {
+            seller = await User.create({
+              name: item.seller.name || 'AI Seller',
+              email: item.seller.email,
+              password: 'AiSellerPassword123!',
+              role: 'seller',
+              storeName: item.seller.storeName || 'AI Store',
+              bio: item.seller.bio || ''
+            });
+            allSellers.push(seller); // Keep track of the newly created seller
+          }
         }
       }
 
@@ -258,6 +287,9 @@ exports.generateAiProducts = async (req, res) => {
         category: item.category || 'Other',
         stock: item.stock || 10,
         condition: item.condition || 'New',
+        options: item.options || [],
+        specifications: item.specifications || {},
+        features: item.features || [],
         isAvailable: true,
         images: images
       });

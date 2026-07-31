@@ -91,6 +91,72 @@ exports.getOrCreateProductChat = async (req, res) => {
   }
 };
 
+// Get or create chat with the AI Assistant
+exports.getOrCreateAiChat = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const aiBotId = parseInt(process.env.AI_BOT_ID);
+
+    if (!aiBotId) {
+      return res.status(500).json({ message: 'AI Bot is not configured properly' });
+    }
+
+    // Find existing chat or create new one
+    let chat = await Chat.findOne({
+      where: {
+        [Op.or]: [
+          { [Op.and]: [{ participant1Id: userId }, { participant2Id: aiBotId }] },
+          { [Op.and]: [{ participant1Id: aiBotId }, { participant2Id: userId }] }
+        ]
+      }
+    });
+
+    if (!chat) {
+      chat = await Chat.create({
+        participant1Id: userId,
+        participant2Id: aiBotId,
+        lastMessage: 'Chat started with AI Assistant',
+        lastMessageTime: new Date()
+      });
+    }
+
+    // Return chat with participant info for frontend use
+    const chatWithParticipants = await Chat.findByPk(chat.id, {
+      include: [
+        { model: User, as: 'participant1', attributes: ['id', 'name', 'storeName', 'profilePicture'] },
+        { model: User, as: 'participant2', attributes: ['id', 'name', 'storeName', 'profilePicture'] }
+      ]
+    });
+
+    res.json(chatWithParticipants);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get chat by ID
+exports.getChatById = async (req, res) => {
+  try {
+    const chat = await Chat.findByPk(req.params.chatId, {
+      include: [
+        { model: Product, as: 'product', attributes: ['id', 'name', 'price', 'images'] },
+        { model: User, as: 'participant1', attributes: ['id', 'name', 'storeName', 'profilePicture'] },
+        { model: User, as: 'participant2', attributes: ['id', 'name', 'storeName', 'profilePicture'] }
+      ]
+    });
+    if (!chat) return res.status(404).json({ message: 'Chat not found' });
+    
+    // Ensure user is participant
+    if (chat.participant1Id !== req.user.id && chat.participant2Id !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized for this chat' });
+    }
+    
+    res.json(chat);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Get chat messages
 exports.getChatMessages = async (req, res) => {
   try {
@@ -158,9 +224,32 @@ exports.sendMessage = async (req, res) => {
 
     res.status(201).json(populatedMessage);
 
-    // AI BOT INTEGRATION
+    // AI BOT INTEGRATION & BROADCAST
     const aiBotId = parseInt(process.env.AI_BOT_ID);
     const otherParticipantId = chat.participant1Id === senderId ? chat.participant2Id : chat.participant1Id;
+
+    if (req.app && req.app.get('io')) {
+      const io = req.app.get('io');
+      const messageData = {
+        id: populatedMessage.id,
+        chatId,
+        senderId,
+        message: populatedMessage.message,
+        type: populatedMessage.type,
+        attachment: populatedMessage.attachment,
+        senderName: populatedMessage.sender.name,
+        senderStore: populatedMessage.sender.storeName,
+        senderAvatar: populatedMessage.sender.profilePicture,
+        createdAt: populatedMessage.createdAt,
+        isRead: false
+      };
+      
+      // Broadcast to everyone in the room (other user)
+      io.to(`chat_${chatId}`).emit('newChatMessage', messageData);
+      
+      // Send notification to the other user if they are online but not in the room
+      io.to(`user_${otherParticipantId}`).emit('incomingChatNotification', messageData);
+    }
 
     if (otherParticipantId === aiBotId) {
       // It's a message to the AI bot, let's generate a response asynchronously
