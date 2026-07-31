@@ -1,5 +1,6 @@
 const { Chat, Message, User, Product } = require('../models');
 const { Op } = require('sequelize');
+const aiService = require('../services/aiService');
 
 // Get or create a chat between buyer and seller for a product
 exports.getOrCreateProductChat = async (req, res) => {
@@ -156,6 +157,67 @@ exports.sendMessage = async (req, res) => {
     });
 
     res.status(201).json(populatedMessage);
+
+    // AI BOT INTEGRATION
+    const aiBotId = parseInt(process.env.AI_BOT_ID);
+    const otherParticipantId = chat.participant1Id === senderId ? chat.participant2Id : chat.participant1Id;
+
+    if (otherParticipantId === aiBotId) {
+      // It's a message to the AI bot, let's generate a response asynchronously
+      process.nextTick(async () => {
+        try {
+          // Get recent chat history
+          const history = await Message.findAll({
+            where: { chatId },
+            order: [['createdAt', 'DESC']],
+            limit: 10
+          });
+          
+          const chatHistory = history.reverse();
+          const aiResponseText = await aiService.generateChatResponse(message, chatHistory);
+          
+          // Create AI response message
+          const aiMessage = await Message.create({
+            chatId,
+            senderId: aiBotId,
+            message: aiResponseText,
+            type: 'text',
+            attachment: null
+          });
+
+          await chat.update({
+            lastMessage: aiResponseText,
+            lastMessageTime: new Date()
+          });
+
+          const populatedAiMessage = await Message.findByPk(aiMessage.id, {
+            include: [{ model: User, as: 'sender', attributes: ['id', 'name', 'storeName', 'profilePicture'] }]
+          });
+
+          // Emit to socket if possible
+          if (req.app && req.app.get('io')) {
+            const io = req.app.get('io');
+            const messageData = {
+              id: aiMessage.id,
+              chatId,
+              senderId: aiBotId,
+              message: aiMessage.message,
+              type: aiMessage.type,
+              attachment: aiMessage.attachment,
+              senderName: populatedAiMessage.sender.name,
+              senderStore: populatedAiMessage.sender.storeName,
+              senderAvatar: populatedAiMessage.sender.profilePicture,
+              createdAt: aiMessage.createdAt,
+              isRead: false
+            };
+            io.to(`chat_${chatId}`).emit('newChatMessage', messageData);
+          }
+        } catch (err) {
+          console.error('Error in AI bot response:', err);
+        }
+      });
+    }
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

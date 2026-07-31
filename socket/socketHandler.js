@@ -1,6 +1,7 @@
 
 const { Chat, Message, User, LiveSession } = require('../models');
 const { Op } = require('sequelize');
+const aiService = require('../services/aiService');
 
 const userSockets = new Map();
 const userTyping = new Map();
@@ -147,6 +148,57 @@ exports.setupSocketHandlers = (io) => {
           lastMessage: message || `[${type.toUpperCase()}]`,
           lastMessageTime: new Date()
         });
+
+        // AI BOT INTEGRATION
+        const aiBotId = parseInt(process.env.AI_BOT_ID);
+        if (receiverId === aiBotId) {
+          process.nextTick(async () => {
+            try {
+              const history = await Message.findAll({
+                where: { chatId },
+                order: [['createdAt', 'DESC']],
+                limit: 10
+              });
+              const chatHistory = history.reverse();
+              const aiResponseText = await aiService.generateChatResponse(message, chatHistory);
+
+              const aiMessage = await Message.create({
+                chatId,
+                senderId: aiBotId,
+                message: aiResponseText,
+                type: 'text'
+              });
+
+              await chat.update({
+                lastMessage: aiResponseText,
+                lastMessageTime: new Date()
+              });
+
+              const populatedAiMessage = await Message.findByPk(aiMessage.id, {
+                include: [{ model: User, as: 'sender', attributes: ['id', 'name', 'storeName', 'profilePicture'] }]
+              });
+
+              const aiMessageData = {
+                id: aiMessage.id,
+                chatId,
+                senderId: aiBotId,
+                message: aiMessage.message,
+                type: aiMessage.type,
+                attachment: aiMessage.attachment,
+                senderName: populatedAiMessage.sender.name,
+                senderStore: populatedAiMessage.sender.storeName,
+                senderAvatar: populatedAiMessage.sender.profilePicture,
+                createdAt: aiMessage.createdAt,
+                isRead: false
+              };
+
+              io.to(`chat_${chatId}`).emit('newChatMessage', aiMessageData);
+            } catch (err) {
+              console.error('Error generating AI response in socket:', err);
+            }
+          });
+        }
+
       } catch (error) {
         console.error('Send chat message error:', error);
         socket.emit('chatError', { message: 'Failed to send message' });

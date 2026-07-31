@@ -1,4 +1,6 @@
 const { User, Product, Order, OrderItem } = require('../models');
+const aiService = require('../services/aiService');
+const bcrypt = require('bcryptjs');
 
 exports.getAdminStats = async (req, res) => {
   try {
@@ -204,5 +206,72 @@ exports.deleteAdminUser = async (req, res) => {
   } catch (error) {
     await transaction.rollback();
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.generateAiProducts = async (req, res) => {
+  try {
+    const { count = 5 } = req.body;
+    
+    // 1. Ask AI to generate product data and dummy seller personas
+    const aiData = await aiService.generateProducts(count);
+    
+    if (!aiData || !aiData.products || !Array.isArray(aiData.products)) {
+      return res.status(500).json({ message: 'Invalid AI response format' });
+    }
+
+    const createdProducts = [];
+
+    // 2. Process each generated product
+    for (const item of aiData.products) {
+      // Find or create the seller
+      let seller = null;
+      if (item.seller && item.seller.email) {
+        seller = await User.findOne({ where: { email: item.seller.email } });
+        if (!seller) {
+          seller = await User.create({
+            name: item.seller.name || 'AI Seller',
+            email: item.seller.email,
+            password: 'AiSellerPassword123!',
+            role: 'seller',
+            storeName: item.seller.storeName || 'AI Store',
+            bio: item.seller.bio || ''
+          });
+        }
+      }
+
+      const sellerId = seller ? seller.id : req.user.id;
+
+      // 3. Download/generate image
+      let images = [];
+      if (item.imageTopic) {
+        const imagePath = await aiService.downloadImage(item.imageTopic);
+        images = [imagePath];
+      }
+
+      // 4. Create the product
+      const product = await Product.create({
+        sellerId: sellerId,
+        name: item.productName || 'Unknown Product',
+        description: item.description || '',
+        price: item.price || 9.99,
+        category: item.category || 'Other',
+        stock: item.stock || 10,
+        condition: item.condition || 'New',
+        isAvailable: true,
+        images: images
+      });
+
+      createdProducts.push(product);
+    }
+
+    res.status(201).json({
+      message: `Successfully generated ${createdProducts.length} AI products`,
+      products: createdProducts
+    });
+
+  } catch (error) {
+    console.error('Error in generateAiProducts:', error);
+    res.status(500).json({ message: error.message || 'Failed to generate products' });
   }
 };

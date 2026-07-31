@@ -65,7 +65,32 @@ async function ensureAdminUser() {
   }
 }
 
+async function ensureAiBotUser() {
+  const aiEmail = process.env.AI_BOT_EMAIL || 'ai@apnamarket.com';
+  const aiName = process.env.AI_BOT_NAME || 'Apna Market AI Assistant';
+  const aiPassword = 'AI_BOT_SUPER_SECRET_PASSWORD_123!';
+
+  try {
+    let aiUser = await User.findOne({ where: { email: aiEmail } });
+    if (!aiUser) {
+      aiUser = await User.create({
+        name: aiName,
+        email: aiEmail,
+        password: aiPassword,
+        role: 'buyer',
+        bio: 'I am the Apna Market AI Assistant. Ask me anything about products!'
+      });
+      console.log(`AI Bot account created: ${aiEmail}`);
+    }
+    // Make AI bot ID globally available so we know which ID belongs to the bot
+    process.env.AI_BOT_ID = aiUser.id;
+  } catch (error) {
+    console.error('Failed to create AI bot account:', error);
+  }
+}
+
 ensureAdminUser();
+ensureAiBotUser();
 
 
 setupSocketHandlers(io);

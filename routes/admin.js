@@ -10,7 +10,8 @@ const {
   deleteAdminProduct,
   updateAdminOrderStatus,
   updateAdminUser,
-  deleteAdminUser
+  deleteAdminUser,
+  generateAiProducts
 } = require('../controllers/adminController');
 
 const router = express.Router();
@@ -18,6 +19,7 @@ const router = express.Router();
 router.use(protect, adminOnly);
 router.get('/stats', getAdminStats);
 router.get('/products', getAdminProducts);
+router.post('/products/generate', generateAiProducts);
 router.post('/products', createAdminProduct);
 router.put('/products/:id', updateAdminProduct);
 router.delete('/products/:id', deleteAdminProduct);
